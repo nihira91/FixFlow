@@ -1,0 +1,29 @@
+{
+    "name": "technician-module-backend",
+    "version": "1.0.0",
+    "description": "Backend for technicin module of issue management system",
+    "main": "server.js",
+    "type": "commonjs",
+    "scripts": {
+        "dev": "nodemon ./server.js",
+        "start": "node server.js"
+    },
+    "keywords": [
+        "technicin",
+        "issue-management",
+        "backend",
+        "node",
+        "express"
+    ],
+    "author": "Ankita",
+    "license": "MIT",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.3",
+        "express": "^5.2.1",
+        "helmet": "^8.1.0",
+        "mongoose": "^9.0.0",
+        "morgan": "^1.10.1",
+        "nodemon": "^3.1.11"
+    }
+}
