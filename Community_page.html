@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FixFlow IMS — Interaction Dashboard</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#00b7a8',
+            secondary: '#009fbe'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body{
+      background:
+        radial-gradient(circle at 10% 90%, rgba(0,183,168,0.08) 0 10%, transparent 10%),
+        radial-gradient(circle at 95% 10%, rgba(0,159,190,0.06) 0 12%, transparent 12%),
+        #f3fbfb;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.64));
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.7);
+    }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px);} to { opacity:1; transform: translateY(0);} }
+    @keyframes pop { 0%{transform:scale(1);}50%{transform:scale(1.08);}100%{transform:scale(1);} }
+    .animate-fadeUp { animation: fadeUp .45s ease both; }
+    .animate-pop { animation: pop .22s ease both; }
+
+    
+    ::-webkit-scrollbar { width:10px; height:10px; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius:10px;}
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <header class="sticky top-4 z-40 max-w-7xl mx-auto px-6">
+    <div class="flex items-center justify-between glass p-3 rounded-xl shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="px-3 py-2 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-bold">🛠️</div>
+        <div>
+          <div class="text-lg font-semibold">FixFlow IMS</div>
+          <div class="text-xs text-gray-600">Unified Interaction Workspace</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <input id="globalSearch" type="search" placeholder="Search feed, users, issues..." 
+               class="px-4 py-2 rounded-full border border-gray-200 w-80 focus:ring-2 focus:ring-primary">
+        <div id="profileBadge" class="flex items-center gap-3 px-3 py-2 rounded-lg">
+          <div id="profileAvatar" class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary text-white flex items-center justify-center font-bold">A</div>
+          <div class="text-sm">
+            <div id="profileNameTop" class="font-semibold">Aisha</div>
+            <div id="profileRoleTop" class="text-xs text-gray-500">Employee</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <main class="max-w-7xl mx-auto mt-6 px-6 flex gap-6">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="w-64 flex-shrink-0">
+      <div class="glass p-4 rounded-2xl shadow-sm animate-fadeUp">
+        <nav class="space-y-3">
+          <a class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/30 transition"><span>🏠</span> Dashboard</a>
+          <a class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/30 transition"><span>📣</span> Issue Feed</a>
+          <a class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/30 transition"><span>💬</span> Chats</a>
+          <a class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/30 transition"><span>👥</span> Teams</a>
+          <a class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/30 transition"><span>🧾</span> My Tasks</a>
+        </nav>
+      </div>
+
+      <div class="mt-4 glass p-4 rounded-2xl shadow-sm animate-fadeUp">
+        <div class="text-sm text-gray-700 font-semibold mb-2">Quick Connect</div>
+        <div class="space-y-2">
+          <button class="w-full text-left px-3 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-white transform transition hover:-translate-y-1">Technician Team</button>
+          <button class="w-full text-left px-3 py-2 rounded-lg border">Admin Group</button>
+          <button class="w-full text-left px-3 py-2 rounded-lg border">Employees</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER FEED -->
+    <section class="flex-1">
+
+      <!-- NEW POST -->
+      <div class="glass p-5 rounded-2xl shadow-sm mb-6 animate-fadeUp">
+        <div class="flex items-start gap-4">
+          <div id="newAvatar" class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">A</div>
+          <div class="flex-1">
+            <textarea id="newPostText" rows="2" placeholder="Share an update, report an issue, or post an announcement..." 
+                      class="w-full resize-none rounded-lg border px-4 py-3 focus:ring-2 focus:ring-primary"></textarea>
+
+            <div class="mt-3 flex items-center justify-between">
+              <div class="flex items-center gap-2 text-sm text-gray-600">
+                <label class="flex items-center gap-2"><input id="postAnon" type="checkbox"> Post anonymously</label>
+                <label class="flex items-center gap-2"><input id="postPublic" type="checkbox" checked> Public</label>
+              </div>
+              <div class="flex items-center gap-3">
+                <button id="attachBtn" class="px-3 py-2 rounded-lg border">Attach</button>
+                <button id="postBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:shadow-lg transform transition hover:-translate-y-0.5">Post</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEED LIST -->
+      <div id="feed" class="space-y-4">
+        
+      </div>
+
+    </section>
+
+    <!-- RIGHT WIDGETS -->
+    <aside class="w-80 flex-shrink-0 space-y-4">
+
+      <div class="glass p-4 rounded-2xl shadow-sm animate-fadeUp">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-sm text-gray-600">Hi, <span id="profileName">Aisha</span></div>
+            <div class="text-xs text-gray-500">Role: <span id="profileRole">Employee</span></div>
+          </div>
+          <div id="avatarRight" class="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-secondary text-white flex items-center justify-center">A</div>
+        </div>
+
+        <div class="mt-4 text-sm text-gray-700">
+          <div class="font-semibold">Reminders</div>
+          <div class="mt-2 p-3 rounded-lg bg-white/60">Maintenance — 7:00 PM</div>
+        </div>
+      </div>
+
+      <div class="glass p-4 rounded-2xl shadow-sm animate-fadeUp">
+        <div class="font-semibold text-gray-700 mb-2">My Events</div>
+        <ul class="space-y-2 text-sm text-gray-600">
+          <li>09 Mar — AC check</li>
+          <li>12 Mar — Network audit</li>
+          <li>15 Mar — Inventory</li>
+        </ul>
+      </div>
+
+      <div class="glass p-4 rounded-2xl shadow-sm animate-fadeUp">
+        <div class="font-semibold text-gray-700 mb-2">Pinned</div>
+        <div class="text-sm text-gray-600">Admin: Follow ladder safety protocol.</div>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- post template -->
+  <template id="postTemplate">
+    <article class="glass p-4 rounded-2xl shadow animate-fadeUp">
+      <div class="flex gap-3">
+        <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold author-avatar">A</div>
+        <div class="flex-1">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-semibold author-name">Aisha</span>
+                <span class="text-xs text-gray-500 author-role">Employee</span>
+                <span class="text-xs text-gray-400 ml-2 post-time">• 1h</span>
+              </div>
+              <div class="text-gray-700 mt-2 post-content"></div>
+            </div>
+            <div class="text-right text-xs text-gray-500">#ID:<span class="post-id">102</span></div>
+          </div>
+
+          <div class="mt-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <button class="likeBtn flex items-center gap-2 text-gray-600 px-2 py-1 rounded-md hover:bg-white/40 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 9l1 1-5 5-5-5 1-1 4 4 4-4z"/></svg>
+                <span class="likeCount">0</span>
+              </button>
+
+              <button class="commentToggle text-gray-600 px-2 py-1 rounded-md hover:bg-white/40 transition">💬 <span class="commentCount">0</span></button>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button class="assignBtn text-xs px-3 py-1 border rounded-md text-primary hidden">Assign</button>
+              <button class="viewBtn text-xs px-3 py-1 border rounded-md">View</button>
+            </div>
+          </div>
+
+          <div class="mt-3 commentsArea hidden">
+            <div class="space-y-2 commentList text-sm text-gray-700"></div>
+            <div class="mt-2 flex items-center gap-2">
+              <input class="commentInput flex-1 px-3 py-2 rounded-lg border" placeholder="Write a comment...">
+              <button class="postCommentBtn px-3 py-2 bg-primary text-white rounded-lg">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script defer src="interaction-dashboard.js"></script>
+</body>
+</html>
