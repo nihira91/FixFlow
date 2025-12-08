@@ -40,20 +40,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initial hidden state (JS controlled so Tailwind doesn't overwrite)
     cards.forEach(card => {
         card.style.opacity = "0";
-        card.style.transform = "translateY(40px)";
-        card.style.transition = "all 0.8s ease-out";
+        card.style.transform = "translateY(40px) scale(0.95)";
+        card.style.transition = "all 0.8s cubic-bezier(0.22, 1, 0.36, 1)";
     });
 
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry, index)=> {
             if (entry.isIntersecting) {
 
                 // Show animation
-                entry.target.style.opacity = "1";
-                entry.target.style.transform = "translateY(0)";
+                setTimeout(() => {    
+                    entry.target.style.opacity = "1";
+                    entry.target.style.transform = "translateY(0) scale(1)";
+                }, index * 150);   
 
-                observer.unobserve(entry.target);
-            }
+            observer.unobserve(entry.target);
+        }              
         });
     }, { threshold: 0.2 });
 
