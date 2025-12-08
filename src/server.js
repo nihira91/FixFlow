@@ -14,6 +14,8 @@ connectDB();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static("src/public"));
+
 
 app.get("/", (req, res) => {
   res.send("IT-IMS Backend Running Successfully ✔");
