@@ -1,73 +1,36 @@
-// const form = document.getElementById("loginForm");
-// const password = document.getElementById("password");
-// const pwError = document.getElementById("pwError");
-
-// form.addEventListener("submit", function (event) {
-//     const pwValue = password.value;
-
-//     // Password must contain:
-//     // 1 uppercase letter, 1 digit, 1 special character
-//     const pwRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
-
-//     if (!pwRegex.test(pwValue)) {
-//         pwError.classList.remove("hidden");
-//         event.preventDefault();
-//     } else {
-//         pwError.classList.add("hidden");
-//     }
-// });
-console.log("login.js loaded!");
+console.log("login.js loaded");
 
 const form = document.getElementById("loginForm");
-const email = document.getElementById("email");
-const password = document.getElementById("password");
-const pwError = document.getElementById("pwError");
 
-form.addEventListener("submit", async function (event) {
-    event.preventDefault();
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    const pwValue = password.value;
-    const pwRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-    if (!pwRegex.test(pwValue)) {
-        pwError.classList.remove("hidden");
-        return;
-    } else {
-        pwError.classList.add("hidden");
-    }
+  const response = await fetch("http://localhost:5000/api/employee/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
 
-    console.log("Sending login request...");
+  const data = await response.json();
+  console.log("LOGIN RESPONSE:", data);
 
-    const role = document.querySelector('input[name="role"]:checked').value;
+  if (!response.ok) {
+    alert(data.message || "Login failed");
+    return;
+  }
 
-    try {
-        const response = await fetch("/api/auth/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                email: email.value,
-                password: password.value,
-                role: role
-            }),
-        });
+  localStorage.setItem("token", data.token);
 
-        const data = await response.json();
-        console.log("Response:", data);
+  const userRole = data.user.role.toLowerCase();
 
-        if (response.ok) {
-            alert("Login Successful!");
-
-            if (data.role === "Employee") {
-                window.location.href = "Employee.html";
-            } else if (data.role === "Technician") {
-                window.location.href = "Technician.html";
-            }
-        } else {
-            alert(data.message || "Login failed");
-        }
-
-    } catch (error) {
-        console.error("Error:", error);
-        alert("Server not responding");
-    }
+  if (userRole === "employee") {
+    window.location.replace("./Employee.html");
+  } else if (userRole === "technician") {
+    window.location.replace("./Technician.html");
+  } else if (userRole === "admin") {
+    window.location.replace("./Admin.html");
+  }
 });

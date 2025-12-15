@@ -1,19 +1,39 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const verifyBtn = document.getElementById("verifyBtn");
-    const input = document.getElementById("empIdInput");
-    const msg = document.getElementById("verifyMsg");
+document.addEventListener("DOMContentLoaded", async () => {
 
-    verifyBtn.addEventListener("click", () => {
-        const empID = input.value.trim();
+    const token = localStorage.getItem("token");
 
-        const validIDs = ["EMP001", "EMP123", "EMPXYZ", "EMP2025"];
+    if (!token) {
+        window.location.replace("login.html");
+        return;
+    }
 
-        if (validIDs.includes(empID)) {
-            msg.textContent = "✔ Employee Verified — Access Granted";
-            msg.className = "mt-3 text-green-600 font-semibold";
-        } else {
-            msg.textContent = "✖ Invalid Employee ID — Access Denied";
-            msg.className = "mt-3 text-red-600 font-semibold";
+    try {
+        
+        const res = await fetch("http://localhost:5000/api/employee/auth/profile", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error("Unauthorized");
         }
+
+        const user = await res.json();
+
+        document.getElementById("welcomeName").textContent = user.name;
+        document.getElementById("empName").textContent = user.name;
+        document.getElementById("empEmail").textContent = user.email;
+        document.getElementById("empRole").textContent = user.role.toUpperCase();
+
+    } catch (err) {
+        console.error("Auth failed:", err);
+        localStorage.removeItem("token");
+        window.location.replace("login.html");
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+        localStorage.removeItem("token");
+        window.location.replace("login.html");
     });
 });
