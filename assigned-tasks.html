@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Assigned Tasks | FixFlow IMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp .6s ease forwards; }
+
+    @media (hover: none) {
+      .task-card:hover {
+        transform: none !important;
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 via-cyan-50/40 to-white min-h-screen">
+
+<!-- HEADER -->
+<header class="bg-gradient-to-r from-teal-600 to-cyan-600 text-white p-6 rounded-b-3xl shadow-lg fade-up">
+  <h1 class="text-3xl font-bold">Assigned Tasks 🛠️</h1>
+  <p class="opacity-90">Tasks currently assigned to you</p>
+</header>
+
+<!-- TASK GRID -->
+<section class="max-w-6xl mx-auto p-6 grid md:grid-cols-3 gap-6 fade-up">
+
+  <!-- PENDING -->
+  <div class="task-card bg-white rounded-2xl shadow-md p-6 border-l-8 border-yellow-300
+              transition-all duration-300
+              hover:scale-[1.015]
+              hover:shadow-lg
+              hover:ring-1 hover:ring-yellow-200/40
+              active:scale-[0.99]">
+
+    <div class="flex justify-between items-start">
+      <div>
+        <h3 class="font-semibold text-lg">❄️ AC Not Working</h3>
+        <p class="text-gray-500 text-sm mt-1">Room 203 · Admin Block</p>
+      </div>
+      <span class="px-3 py-1 text-sm bg-yellow-50 text-yellow-700 rounded-full">
+        Pending
+      </span>
+    </div>
+
+    <div class="mt-5">
+      <div class="flex justify-between text-sm mb-1">
+        <span class="text-gray-500">Progress</span>
+        <span class="text-yellow-600 font-medium">30%</span>
+      </div>
+      <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div class="h-full bg-yellow-300 w-[30%]"></div>
+      </div>
+    </div>
+
+    <button class="mt-5 w-full bg-gradient-to-r from-yellow-300 to-yellow-400
+                   text-white py-2 rounded-xl hover:opacity-90 transition">
+      Start Task
+    </button>
+  </div>
+
+  <!-- ASSIGNED -->
+  <div class="task-card bg-white rounded-2xl shadow-md p-6 border-l-8 border-blue-400
+              transition-all duration-300
+              hover:scale-[1.015]
+              hover:shadow-lg
+              hover:ring-1 hover:ring-blue-200/40
+              active:scale-[0.99]">
+
+    <div class="flex justify-between items-start">
+      <div>
+        <h3 class="font-semibold text-lg">🌐 Network Issue</h3>
+        <p class="text-gray-500 text-sm mt-1">Lab 1 · IT Department</p>
+      </div>
+      <span class="px-3 py-1 text-sm bg-blue-50 text-blue-700 rounded-full">
+        Assigned
+      </span>
+    </div>
+
+    <div class="mt-5 flex items-center justify-between text-sm">
+      <span class="text-gray-500">Assigned by Admin</span>
+      <span class="text-blue-600 font-medium">Just now</span>
+    </div>
+
+    <button class="mt-6 w-full bg-gradient-to-r from-blue-400 to-blue-500
+                   text-white py-2 rounded-xl hover:opacity-90 transition">
+      View Details
+    </button>
+  </div>
+
+  <!-- IN PROGRESS -->
+  <div class="task-card bg-white rounded-2xl shadow-md p-6 border-l-8 border-purple-400
+              transition-all duration-300
+              hover:scale-[1.015]
+              hover:shadow-lg
+              hover:ring-1 hover:ring-purple-200/40
+              active:scale-[0.99]">
+
+    <div class="flex justify-between items-start">
+      <div>
+        <h3 class="font-semibold text-lg">🔌 Power Socket Issue</h3>
+        <p class="text-gray-500 text-sm mt-1">Conference Hall</p>
+      </div>
+      <span class="px-3 py-1 text-sm bg-purple-50 text-purple-700 rounded-full">
+        In Progress
+      </span>
+    </div>
+
+    <div class="mt-5">
+      <div class="flex justify-between text-sm mb-1">
+        <span class="text-gray-500">Progress</span>
+        <span class="text-purple-600 font-medium">65%</span>
+      </div>
+      <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div class="h-full bg-purple-400 w-[65%]"></div>
+      </div>
+    </div>
+
+    <button class="mt-5 w-full bg-gradient-to-r from-purple-400 to-purple-500
+                   text-white py-2 rounded-xl hover:opacity-90 transition">
+      Continue
+    </button>
+  </div>
+
+</section>
+
+<script src="technician.js"></script>
+</body>
+</html>

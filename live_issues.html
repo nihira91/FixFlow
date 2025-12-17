@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Issues | FixFlow IMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp .6s ease forwards; }
+
+    /* Disable hover jump on touch devices */
+    @media (hover: none) {
+      .issue-card:hover {
+        transform: none !important;
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-teal-50 via-cyan-50 to-white min-h-screen">
+
+<!-- HEADER -->
+<header class="bg-gradient-to-r from-teal-500 to-cyan-500 text-white p-6 rounded-b-3xl shadow-lg fade-up">
+  <h1 class="text-3xl font-bold">Live Issues 🚨</h1>
+  <p class="opacity-90">Issues reported in real time</p>
+</header>
+
+<!-- FILTER BAR -->
+<section class="max-w-6xl mx-auto mt-6 px-6 flex flex-wrap gap-3 fade-up">
+  <span class="px-4 py-1 rounded-full bg-red-100 text-red-600 text-sm">Critical</span>
+  <span class="px-4 py-1 rounded-full bg-yellow-100 text-yellow-600 text-sm">Medium</span>
+  <span class="px-4 py-1 rounded-full bg-blue-100 text-blue-600 text-sm">Low</span>
+  <span class="px-4 py-1 rounded-full bg-gray-200 text-gray-700 text-sm">All</span>
+</section>
+
+<!-- ISSUES GRID -->
+<section class="max-w-6xl mx-auto p-6 grid md:grid-cols-2 gap-6 fade-up">
+
+  <!-- CRITICAL -->
+  <div class="issue-card bg-white rounded-2xl shadow-lg p-6 border-l-8 border-red-500
+              transition-all duration-300
+              hover:scale-[1.02]
+              hover:shadow-xl
+              hover:ring-2 hover:ring-red-300/40
+              active:scale-[0.99]">
+
+    <div class="flex justify-between items-start">
+      <div>
+        <h3 class="text-lg font-semibold">⚡ Power Failure</h3>
+        <p class="text-gray-500 text-sm">Server Room · Block A</p>
+      </div>
+      <span class="px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm animate-pulse">
+        Critical
+      </span>
+    </div>
+
+    <div class="mt-4 text-sm text-gray-600">
+      <p>Reported by: Admin</p>
+      <p>10 mins ago</p>
+    </div>
+
+    <div class="mt-4 flex gap-3">
+      <button class="flex-1 bg-teal-500 text-white py-2 rounded-xl hover:bg-teal-600 transition">
+        Accept
+      </button>
+      <button class="flex-1 bg-gray-100 py-2 rounded-xl hover:bg-gray-200 transition">
+        View
+      </button>
+    </div>
+  </div>
+
+  <!-- MEDIUM -->
+  <div class="issue-card bg-white rounded-2xl shadow-lg p-6 border-l-8 border-yellow-400
+              transition-all duration-300
+              hover:scale-[1.02]
+              hover:shadow-xl
+              hover:ring-2 hover:ring-yellow-300/40
+              active:scale-[0.99]">
+
+    <div class="flex justify-between items-start">
+      <div>
+        <h3 class="text-lg font-semibold">🖨️ Printer Jam</h3>
+        <p class="text-gray-500 text-sm">Office 12A</p>
+      </div>
+      <span class="px-3 py-1 bg-yellow-100 text-yellow-600 rounded-full text-sm">
+        Medium
+      </span>
+    </div>
+
+    <div class="mt-4 text-sm text-gray-600">
+      <p>Reported by: Employee</p>
+      <p>35 mins ago</p>
+    </div>
+
+    <div class="mt-4 flex gap-3">
+      <button class="flex-1 bg-teal-500 text-white py-2 rounded-xl hover:bg-teal-600 transition">
+        Accept
+      </button>
+      <button class="flex-1 bg-gray-100 py-2 rounded-xl hover:bg-gray-200 transition">
+        View
+      </button>
+    </div>
+  </div>
+
+  <!-- LOW -->
+  <div class="issue-card bg-white rounded-2xl shadow-lg p-6 border-l-8 border-blue-500
+              transition-all duration-300
+              hover:scale-[1.02]
+              hover:shadow-xl
+              hover:ring-2 hover:ring-blue-300/40
+              active:scale-[0.99]">
+
+    <div class="flex justify-between items-start">
+      <div>
+        <h3 class="text-lg font-semibold">🌐 Network Slow</h3>
+        <p class="text-gray-500 text-sm">Lab 3 · IT Dept</p>
+      </div>
+      <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">
+        Low
+      </span>
+    </div>
+
+    <div class="mt-4 text-sm text-gray-600">
+      <p>Reported by: Staff</p>
+      <p>1 hour ago</p>
+    </div>
+
+    <div class="mt-4 flex gap-3">
+      <button class="flex-1 bg-teal-500 text-white py-2 rounded-xl hover:bg-teal-600 transition">
+        Accept
+      </button>
+      <button class="flex-1 bg-gray-100 py-2 rounded-xl hover:bg-gray-200 transition">
+        View
+      </button>
+    </div>
+  </div>
+
+  <!-- ASSIGNED -->
+  <div class="issue-card bg-white rounded-2xl shadow-lg p-6 border-l-8 border-purple-500
+              transition-all duration-300
+              hover:scale-[1.02]
+              hover:shadow-xl
+              hover:ring-2 hover:ring-purple-300/40
+              active:scale-[0.99]">
+
+    <div class="flex justify-between items-start">
+      <div>
+        <h3 class="text-lg font-semibold">❄️ AC Not Cooling</h3>
+        <p class="text-gray-500 text-sm">Conference Hall</p>
+      </div>
+      <span class="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm">
+        Assigned
+      </span>
+    </div>
+
+    <div class="mt-4 text-sm text-gray-600">
+      <p>Status: In Progress</p>
+      <p>Assigned to: You</p>
+    </div>
+
+    <div class="mt-4 flex gap-3">
+      <button class="flex-1 bg-green-500 text-white py-2 rounded-xl hover:bg-green-600 transition">
+        Mark Done
+      </button>
+      <button class="flex-1 bg-gray-100 py-2 rounded-xl hover:bg-gray-200 transition">
+        Details
+      </button>
+    </div>
+  </div>
+
+</section>
+
+<script src="technicianv2.js"></script>
+</body>
+</html>
