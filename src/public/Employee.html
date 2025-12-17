@@ -221,9 +221,16 @@
             <!-- NAV MENU -->
             <nav class="flex flex-col space-y-3 text-gray-700 font-medium">
                 <a class="p-2 rounded-lg bg-primary/20 text-primary">Dashboard</a>
-                <a class="p-2 hover:bg-gray-200 rounded-lg">Report Issue</a>
-                <a class="p-2 hover:bg-gray-200 rounded-lg">My Issues</a>
-                <a class="p-2 hover:bg-gray-200 rounded-lg">Profile</a>
+                <a href="report-issue.html" class="p-2 hover:bg-gray-200 rounded-lg cursor-pointer">
+    Report Issue
+</a>
+
+                <a href="my-issues.html" class="p-2 hover:bg-gray-200 rounded-lg">
+    My Issues
+</a>
+                <a href="profile.html" class="p-2 hover:bg-gray-200 rounded-lg">
+    Profile
+</a>
                 <a id="logoutBtn" class="p-2 hover:bg-gray-200 rounded-lg text-red-500 cursor-pointer">Logout</a>
             </nav>
         </aside>
@@ -268,17 +275,18 @@
 
                 <div class="p-6 bg-white/70 backdrop-blur-lg rounded-xl shadow-lg text-center">
                     <h3 class="text-gray-700 text-lg font-semibold">Total Issues</h3>
-                    <p class="text-3xl font-bold text-primary mt-2">12</p>
+                    <p id="totalIssues" class="text-3xl font-bold text-primary mt-2">0</p>
+
                 </div>
 
                 <div class="p-6 bg-white/70 backdrop-blur-lg rounded-xl shadow-lg text-center">
                     <h3 class="text-gray-700 text-lg font-semibold">In Progress</h3>
-                    <p class="text-3xl font-bold text-secondary mt-2">4</p>
+                    <p id="inProgressIssues" class="text-3xl font-bold text-secondary mt-2">0</p>
                 </div>
 
                 <div class="p-6 bg-white/70 backdrop-blur-lg rounded-xl shadow-lg text-center">
                     <h3 class="text-gray-700 text-lg font-semibold">Resolved Issues</h3>
-                    <p class="text-3xl font-bold text-green-600 mt-2">8</p>
+                    <p id="resolvedIssues" class="text-3xl font-bold text-green-600 mt-2">0</p>
                 </div>
             </div>
 
@@ -298,31 +306,8 @@
                         </tr>
                     </thead>
 
-                    <tbody class="text-gray-700">
-                        <tr class="border-b">
-                            <td>#102</td>
-                            <td>Projector not working</td>
-                            <td class="text-blue-600">In Progress</td>
-                            <td>2 hrs</td>
-                            <td>→</td>
-                        </tr>
+                    <tbody id="recentIssuesTable" class="text-gray-700"></tbody>
 
-                        <tr class="border-b">
-                            <td>#099</td>
-                            <td>Water leakage in hallway</td>
-                            <td class="text-yellow-600">Pending</td>
-                            <td>5 hrs</td>
-                            <td>→</td>
-                        </tr>
-
-                        <tr>
-                            <td>#095</td>
-                            <td>AC not cooling</td>
-                            <td class="text-green-600">Resolved</td>
-                            <td>1 day</td>
-                            <td>→</td>
-                        </tr>
-                    </tbody>
                 </table>
             </div>
 

@@ -1,23 +1,21 @@
-// src/routes/employeeIssue.routes.js
-
 const express = require('express');
 const router = express.Router();
 
 const {
   createIssue,
   getEmployeeIssues,
-  getSingleIssue
+  getSingleIssue,
+  updateIssueStatus
 } = require('../controllers/employeeIssue.controller');
 
 const { employeeAuthCheck } = require('../middlewares/employeeAuthCheck');
 
-// Create new issue
 router.post('/issue/create', employeeAuthCheck, createIssue);
-
-// Get all issues of logged-in employee
-router.get('/issues', employeeAuthCheck, getEmployeeIssues);
-
-// Get details of a specific issue
+// router.get('/issues', employeeAuthCheck, getEmployeeIssues);
+router.get('/', employeeAuthCheck, getEmployeeIssues);
 router.get('/issue/:id', employeeAuthCheck, getSingleIssue);
+router.patch("/issue/:issueId/status", employeeAuthCheck, updateIssueStatus);
+
 
 module.exports = router;
+

@@ -1,36 +1,28 @@
+
 // require("dotenv").config();
-// const express = require("express");
-// const cors = require("cors");
-// const connectDB = require("./config/db");
+// const http = require("http");
+// const mongoose = require("mongoose");
 
-// const authRoutes = require("./routes/authroutes");
-// const employeeRoutes = require("./routes/employeeroutes");
-// const technicianRoutes = require("./routes/technicianroutes");
-// const adminRoutes = require("./routes/adminroutes");
-
-// const app = express();
-
-// connectDB();
-
-// app.use(cors());
-// app.use(express.json());
-// app.use(express.static("src/public"));
+// const app = require("./app");
 
 
-// app.get("/", (req, res) => {
-//   res.send("IT-IMS Backend Running Successfully ✔");
+
+/* =======================
+   Socket Imports
+======================= */
+// const employeeNotificationSocket = require("./socket/employeeNotification.socket");
+// const issueUpdateSocket = require("./socket/issueUpdate.socket");
+// const commentSocket = require("./socket/comment.socket");
+// const employeeIssueSocket = require("./socket/employeeIssue.socket");
+
+// const { Server } = require("socket.io");
+// const socketManager = require("./socket");
+
+// const io = new Server(server, {
+//   cors: { origin: "*" }
 // });
 
-// app.use("/api/auth", authRoutes);
-// app.use("/api/employee", employeeRoutes);
-// app.use("/api/technician", technicianRoutes);
-// app.use("/api/admin", adminRoutes);
-
-// const PORT = process.env.PORT || 5000;
-
-// app.listen(PORT, () => {
-//   console.log(`Server running at http://localhost:${PORT}`);
-// });
+// socketManager.initIO(io);
 
 require("dotenv").config();
 const http = require("http");
@@ -38,52 +30,46 @@ const mongoose = require("mongoose");
 
 const app = require("./app");
 
-/* =======================
-   Socket Imports
-======================= */
-const employeeNotificationSocket = require("./socket/employeeNotification.socket");
-const issueUpdateSocket = require("./socket/issueUpdate.socket");
-const commentSocket = require("./socket/comment.socket");
-
-/* =======================
-   HTTP Server
-======================= */
-const server = http.createServer(app);
-
-/* =======================
-   Socket.IO Setup
-======================= */
-const { Server } = require("socket.io");
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
-});
-
-/* =======================
-   Initialize Sockets
-======================= */
-employeeNotificationSocket(io);
-issueUpdateSocket(io);
-commentSocket(io);
-
-/* =======================
-   Database Connection
-======================= */
+/* ============================
+   CONNECT TO MONGODB FIRST
+============================ */
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected Successfully"))
+  .then(() => {
+    console.log("✅ MongoDB connected");
+
+    /* ============================
+       CREATE HTTP SERVER
+    ============================ */
+    const server = http.createServer(app);
+
+    /* ============================
+       SOCKET.IO SETUP
+    ============================ */
+    const { Server } = require("socket.io");
+    const socketManager = require("./socket");
+
+    const io = new Server(server, {
+      cors: { origin: "*" }
+    });
+
+    socketManager.initIO(io);
+
+    /* ============================
+       START SERVER
+    ============================ */
+    const PORT = process.env.PORT || 5000;
+    server.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  })
   .catch((err) => {
-    console.error("❌ MongoDB Connection Error:", err);
-    process.exit(1);
+    console.error("❌ MongoDB connection failed:", err);
   });
 
-/* =======================
-   Start Server
-======================= */
-const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => {
-  console.log(`🚀 Unified IT-IMS Server running at http://localhost:${PORT}`);
-});
+
+
+
+
+

@@ -20,6 +20,10 @@
       }
     }
   </script>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+
 </head>
 
 <body class="relative overflow-hidden bg-gradient-to-br from-slate-100 via-teal-50 to-white min-h-screen">
@@ -51,22 +55,26 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
       <div class="bg-white/80 backdrop-blur rounded-2xl p-4 text-center shadow">
         <p class="text-sm text-gray-500">Total</p>
-        <p class="text-2xl font-bold text-primary">0</p>
+        <p id="totalCount" class="text-2xl font-bold text-primary">0</p>
+
       </div>
 
       <div class="bg-yellow-50 rounded-2xl p-4 text-center shadow">
         <p class="text-sm text-gray-500">Pending</p>
-        <p class="text-2xl font-bold text-yellow-600">0</p>
+        <p id="pendingCount" class="text-2xl font-bold text-yellow-600">0</p>
+
       </div>
 
       <div class="bg-green-50 rounded-2xl p-4 text-center shadow">
         <p class="text-sm text-gray-500">Resolved</p>
-        <p class="text-2xl font-bold text-green-600">0</p>
+        <p id="resolvedCount" class="text-2xl font-bold text-green-600">0</p>
+
       </div>
 
       <div class="bg-red-50 rounded-2xl p-4 text-center shadow">
         <p class="text-sm text-gray-500">Urgent</p>
-        <p class="text-2xl font-bold text-red-600">0</p>
+        <p id="urgentCount" class="text-2xl font-bold text-red-600">0</p>
+
       </div>
     </div>
 
