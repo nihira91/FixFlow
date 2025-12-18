@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FixFlow IMS | Community</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#00b7a8",
+            secondary: "#009fbe",
+            soft: "#e6fafa"
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #eafefe, #ffffff);
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 36px rgba(0,0,0,.12);
+    }
+    .upvoted {
+      color: #00b7a8;
+      font-weight: 600;
+    }
+  </style>
+
+  <script defer src="comment_section.js"></script>
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<header class="sticky top-0 z-40 backdrop-blur-xl bg-gradient-to-r from-primary via-teal-400 to-secondary shadow-lg">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+
+    <!-- BRAND -->
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl shadow">
+        🛠
+      </div>
+      <div class="leading-tight">
+        <h1 class="text-xl font-bold text-white tracking-wide">
+          FixFlow IMS
+        </h1>
+        <p class="text-xs text-white/80">
+          Community Workspace
+        </p>
+      </div>
+    </div>
+
+    <!-- USER INFO -->
+    <div class="flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/20 hover:bg-white/30 transition">
+      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-white to-soft text-primary flex items-center justify-center font-bold shadow">
+        A
+      </div>
+      <div class="text-sm leading-tight">
+        <div class="font-semibold text-white">Aisha</div>
+        <div class="text-xs text-white/80">Employee</div>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+
+  <!-- FEED -->
+  <section class="md:col-span-3 space-y-6">
+
+    <!-- NEW POST -->
+    <div class="card p-5">
+      <textarea
+        id="postInput"
+        rows="3"
+        class="w-full border rounded-xl p-3 focus:ring-2 focus:ring-primary"
+        placeholder="Share an update or issue with the team…"
+      ></textarea>
+
+      <div class="flex justify-end mt-3">
+        <button
+          id="postBtn"
+          class="px-5 py-2 bg-primary text-white rounded-xl hover:bg-secondary transition">
+          Post
+        </button>
+      </div>
+    </div>
+
+    <!-- POSTS -->
+    <div id="feed" class="space-y-4"></div>
+
+  </section>
+
+</main>
+
+</body>
+</html>
