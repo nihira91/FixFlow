@@ -1,10 +1,25 @@
+
 {
   "name": "it-ims-backend",
   "version": "1.0.0",
+  "description": "Backend for IT Issue Management System (Employee + Technician)",
   "main": "src/server.js",
+  "type": "commonjs",
   "scripts": {
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
   },
+  "keywords": [
+    "it-ims",
+    "issue-management",
+    "backend",
+    "node",
+    "express",
+    "technician",
+    "employee"
+  ],
+  "author": "Team IT-IMS",
+  "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -13,9 +28,10 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.4.0",
-    "morgan": "^1.10.1"
+    "morgan": "^1.10.1",
+    "socket.io": "^4.7.5"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.1.11"
   }
 }
