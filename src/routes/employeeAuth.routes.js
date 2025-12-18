@@ -1,20 +1,27 @@
-
-
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
 const {
+  signupEmployee,
   loginEmployee,
   getEmployeeProfile
-} = require('../controllers/employeeAuth.controller');
+} = require("../controllers/employeeAuth.controller");
 
-const { employeeAuthCheck } = require('../middlewares/employeeAuthCheck');
+const { employeeAuthCheck } = require("../middlewares/employeeAuthCheck");
 
+// ===============================
+// Employee Signup
+// ===============================
+router.post("/signup", signupEmployee);
+
+// ===============================
 // Employee Login
-router.post('/login', loginEmployee);
+// ===============================
+router.post("/login", loginEmployee);
 
-// Get logged-in employee profile
-router.get('/profile', employeeAuthCheck, getEmployeeProfile);
+// ===============================
+// Employee Profile
+// ===============================
+router.get("/profile", employeeAuthCheck, getEmployeeProfile);
 
 module.exports = router;
-

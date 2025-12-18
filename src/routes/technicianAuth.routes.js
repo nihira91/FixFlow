@@ -2,26 +2,34 @@ const express = require("express");
 const router = express.Router();
 
 const {
-    loginTechnician,
-    getTechnicianProfile
+  signupTechnician,
+  loginTechnician,
+  getTechnicianProfile
 } = require("../controllers/technicianAuth.controller");
 
-const { verifyToken, technicianAuthCheck } = require("../middleware/technicianAuthCheck");
+const {
+  verifyToken,
+  technicianAuthCheck
+} = require("../middlewares/technicianAuthCheck");
 
+// ===============================
+// Technician Signup
+// ===============================
+router.post("/signup", signupTechnician);
 
-//technician login
-router.post("/loginn", loginTechnician);
+// ===============================
+// Technician Login
+// ===============================
+router.post("/login", loginTechnician);
 
-//technician profile
+// ===============================
+// Technician Profile
+// ===============================
 router.get(
-    "/profile",
-    verifyToken,
-    technicianAuthCheck("technician"),
-    getTechnicianProfile
+  "/profile",
+  verifyToken,
+  technicianAuthCheck("technician"),
+  getTechnicianProfile
 );
 
 module.exports = router;
-module.exports = {
-    verifyToken,
-    technicianAuthCheck
-};

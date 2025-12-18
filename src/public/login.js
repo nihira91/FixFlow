@@ -45,37 +45,42 @@ const form = document.getElementById("loginForm");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
-  const response = await fetch("http://localhost:5000/api/employee/auth/login", {
+  const role = document
+    .querySelector('input[name="role"]:checked')
+    .value
+    .toLowerCase();
+
+  console.log("🔥 ROLE:", role);
+
+  const API_URL =
+    role === "technician"
+      ? "http://localhost:5000/api/technician/auth/login"
+      : "http://localhost:5000/api/employee/auth/login";
+
+  console.log("🔥 API:", API_URL);
+
+  const response = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password })
   });
 
   const data = await response.json();
-  console.log("LOGIN RESPONSE:", data);
 
   if (!response.ok) {
     alert(data.message || "Login failed");
     return;
   }
 
-  // ✅ SAVE AUTH DATA
   localStorage.setItem("token", data.token);
   localStorage.setItem("user", JSON.stringify(data.user));
 
-  const userRole = data.user.role.toLowerCase();
-
-  // ✅ SINGLE REDIRECT (ROLE BASED)
-  if (userRole === "employee") {
+  if (data.user.role === "employee") {
     window.location.replace("./Employee.html");
-  } else if (userRole === "technician") {
+  } else if (data.user.role === "technician") {
     window.location.replace("./Technician.html");
-  } else if (userRole === "admin") {
-    window.location.replace("./Admin.html");
-  } else {
-    console.error("Unknown role:", userRole);
   }
 });

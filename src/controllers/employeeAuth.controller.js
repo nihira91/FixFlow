@@ -2,6 +2,43 @@ const User = require('../models/user.model');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
+exports.signupEmployee = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: "Email already exists" });
+    }
+
+    const employee = await User.create({
+      name,
+      email,
+      password,
+      role: "employee"
+    });
+
+    return res.status(201).json({
+      message: "Employee registered successfully",
+      user: {
+        id: employee._id,
+        name: employee.name,
+        email: employee.email,
+        role: employee.role
+      }
+    });
+  } catch (error) {
+    console.error("Employee signup error:", error);
+    return res.status(500).json({ message: "Server error during signup" });
+  }
+};
+
+
+
 exports.loginEmployee = async (req, res) => {
   try {
     const { email, password } = req.body;
