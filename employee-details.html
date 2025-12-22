@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Employee Details | FixFlow IMS</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00b7a8",
+                        secondary: "#009fbe",
+                        soft: "#e6fafa"
+                    }
+                }
+            }
+
+        }
+    </script>
+</head>
+
+<body class="bg-gradient-to-br from-teal-50 to-cyan-50 min-h-screen">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-primary to-secondary text-white p-6 shadow-lg">
+        <h1 class="text-2xl font-bold">Employee Profile</h1>
+        <p class="opacity-90 text-sm">Issue Activity Overview</p>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-10">
+
+        <!-- PROFILE SUMMARY -->
+        <div class="bg-white rounded-2xl shadow p-6 mb-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+
+            <div>
+                <p class="text-gray-500 text-sm">Username</p>
+                <p id="empName" class="text-xl font-semibold">—</p>
+            </div>
+
+            <div>
+                <p class="text-gray-500 text-sm">Employee ID</p>
+                <p id="empToken" class="font-medium">—</p>
+            </div>
+
+            <div>
+                <p class="text-gray-500 text-sm">Total Issues</p>
+                <p id="empTotal" class="text-2xl font-bold text-primary">0</p>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm">Pending</p>
+                <p id="empPending" class="text-2xl font-bold text-yellow-500">0</p>
+            </div>
+
+            <div>
+                <p class="text-gray-500 text-sm">Resolved</p>
+                <p id="empResolved" class="text-2xl font-bold text-green-600">0</p>
+            </div>
+
+        </div>
+
+        <!-- CHART CARD -->
+        <div class="bg-white rounded-2xl shadow p-6">
+            <h3 class="text-lg font-semibold mb-4">Issue Distribution</h3>
+
+            <div class="w-56 h-60 mx-auto">
+  <canvas id="employeeChart"></canvas>
+
+
+    </main>
+   
+<!-- ISSUE LIST TABLE -->
+<div class="bg-white rounded-2xl shadow p-6 mt-10 overflow-x-auto">
+  <h3 class="text-lg font-semibold mb-4">Issue History</h3>
+
+  <table class="min-w-full text-sm text-left">
+    <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+      <tr>
+        <th class="px-4 py-3">SN</th>
+        <th class="px-4 py-3">Issue Title</th>
+        <th class="px-4 py-3">Description</th>
+        <th class="px-4 py-3">Category</th>
+        <th class="px-4 py-3">Status</th>
+        <th class="px-4 py-3">Assigned</th>
+        <th class="px-4 py-3">Resolved</th>
+        <th class="px-4 py-3">Contact(Technician)</th>
+      </tr>
+    </thead>
+
+    <tbody id="issueTableBody" class="divide-y"></tbody>
+  </table>
+</div>
+
+<script src="employee-details.js"></script>
+
+</body>
+
+</html>

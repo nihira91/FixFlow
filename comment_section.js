@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <div class="mt-4 flex gap-6 text-sm">
           <button class="likeBtn ${post.liked ? "upvoted" : ""}">
-            ⬆ Upvote (${post.upvotes})
+            ❤️ Like (${post.upvotes})
           </button>
           <button class="commentToggle">
             💬 Comments (${post.comments.length})

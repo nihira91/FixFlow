@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin | Technicians</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+tailwind.config = {
+  theme:{
+    extend:{
+      colors:{
+        primary:"#00b7a8",
+     secondary:"#009fbe",
+        soft:"#e6fafa"
+      }
+    }
+  }
+}
+</script>
+
+<style>
+body{
+  background: radial-gradient(circle at top left, rgba(0,183,168,.15), transparent 40%),
+              radial-gradient(circle at bottom right, rgba(17, 113, 132, 0.15), transparent 40%),
+              #f3ffff;
+}
+.glass{
+  background: rgba(255,255,255,.75);
+  backdrop-filter: blur(12px);
+}
+</style>
+</head>
+
+<body class="min-h-screen">
+
+<!-- HEADER (same style as Employees) -->
+<header class="bg-gradient-to-r from-primary to-secondary text-white px-8 py-6 shadow-xl">
+  <div class="flex justify-between max-w-7xl mx-auto">
+    <h1 class="text-2xl font-bold">Technicians Management</h1>
+    <input id="searchInput"
+      placeholder="Search by name / token / date..."
+      class="px-4 py-2 rounded-xl text-gray-800">
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-8 py-10">
+
+<div class="glass rounded-3xl shadow-2xl overflow-hidden">
+<table class="w-full">
+
+
+<thead class="bg-gray-700 text-gray-100">
+<tr>
+  <th class="p-4 text-left">SN</th>
+  <th class="text-left">Token</th>
+  <th class="text-left">Name</th>
+  <th class="text-left">Joined Date</th>
+  <th class="text-left">Resigned Date</th>
+  <th class="text-left">Details</th>
+</tr>
+</thead>
+
+<tbody id="technicianTable" class="divide-y"></tbody>
+</table>
+</div>
+
+</main>
+
+<script src="admin-technicians.js"></script>
+</body>
+</html>

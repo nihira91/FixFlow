@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin | All Issues Analytics</title>
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#00b7a8"
+      }
+    }
+  }
+}
+</script>
+
+<style>
+body {
+  background:#eaffff;
+}
+.card {
+  background:white;
+  border-radius:28px;
+  box-shadow:0 20px 50px rgba(0,0,0,.12);
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="bg-primary text-white px-8 py-6 shadow-xl">
+  <h1 class="text-2xl font-bold max-w-7xl mx-auto">
+    All Issues Analytics
+  </h1>
+</header>
+
+<main class="max-w-7xl mx-auto px-8 py-10 space-y-10">
+
+  <!-- SUMMARY CARDS -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+
+    <div class="card p-6 border-l-8 border-teal-500 hover:scale-[1.03] transition">
+      <p class="text-sm text-gray-500">Total Issues</p>
+      <p id="totalIssues" class="text-4xl font-bold text-teal-600">0</p>
+    </div>
+
+    <div class="card p-6 border-l-8 border-green-500 hover:scale-[1.03] transition">
+      <p class="text-sm text-gray-500">Resolved</p>
+      <p id="resolvedIssues" class="text-4xl font-bold text-green-600">0</p>
+    </div>
+
+    <div class="card p-6 border-l-8 border-yellow-400 hover:scale-[1.03] transition">
+      <p class="text-sm text-gray-500">Pending</p>
+      <p id="pendingIssues" class="text-4xl font-bold text-yellow-500">0</p>
+    </div>
+
+    <div class="card p-6 border-l-8 border-red-500 hover:scale-[1.03] transition">
+      <p class="text-sm text-gray-500">Critical</p>
+      <p id="criticalIssues" class="text-4xl font-bold text-red-600">0</p>
+    </div>
+
+  </div>
+
+  <!-- PIE CHARTS -->
+  <div class="grid md:grid-cols-2 gap-8">
+
+    <div class="card p-8">
+      <h3 class="font-semibold mb-4">Total Issues by Category</h3>
+      <div class="h-[360px]">
+        <canvas id="totalChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card p-8">
+      <h3 class="font-semibold mb-4">Resolved Issues by Category</h3>
+      <div class="h-[360px]">
+        <canvas id="resolvedChart"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+
+<script src="admin-all-issues.js"></script>
+</body>
+</html>
