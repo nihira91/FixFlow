@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>IT-IMS Login / Signup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* page fade */
+    @keyframes fadeIn { from {opacity:0; transform:translateY(15px)} to {opacity:1; transform:translateY(0)} }
+    .fade { animation: fadeIn 0.6s ease-out; }
+
+    /* popup */
+    @keyframes fadePop { 0% {opacity:0; transform:translateY(-6px)} 100% {opacity:1; transform:translateY(0)} }
+    .fadePopup { animation: fadePop 0.35s ease-out; }
+
+    /* --------- RULES / CHECKMARK STYLES --------- */
+    .ruleNew {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: #6B7280;       /* gray-500 */
+      line-height: 1;
+      transition: color .20s ease;
+    }
+
+    .ruleNew.ok { color: #059669; }
+
+    /* tiny dot that becomes animated */
+    .dotNew {
+      width: 6px;
+      height: 6px;
+      background: #D1D5DB;  /* gray-300 */
+      border-radius: 50%;
+      position: relative;
+      transition: background .2s ease, transform .18s ease;
+    }
+
+    .ruleNew.ok .dotNew {
+      background: #059669;
+      transform: scale(1.2);
+    }
+
+    /* checkmark appears with a pop (positioned just right of the dot) */
+    .ruleNew.ok .dotNew::after {
+      /* content: "✔"; */
+      position: absolute;
+      left: 10px;
+      top: -6px;
+      font-size: 0.65rem;
+      color: #059669;
+      opacity: 0;
+      transform: scale(.6);
+      animation: checkAppear .28s forwards ease-out;
+    }
+
+    @keyframes checkAppear {
+      0% { transform: scale(.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .strength {
+      font-weight: 600;
+      color: #374151; /* gray-700 */
+      font-size: 0.92rem;
+      margin-left: 6px;
+    }
+
+    .invisible { display: none; }
+
+    /* popup style override (keeps tailwind look) */
+    #errorPopup { z-index: 60; }
+  </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <div class="w-full max-w-5xl bg-white rounded-2xl shadow-xl grid grid-cols-1 md:grid-cols-2 overflow-hidden fade">
+
+    <!-- LEFT -->
+    <div class="bg-gradient-to-br from-teal-500 to-teal-700 text-white p-12 flex flex-col justify-center relative">
+      <div class="absolute top-6 right-6 w-20 h-20 bg-white/20 rounded-full blur-md"></div>
+      <div class="text-6xl mb-6">🛡️</div>
+      <h1 class="text-4xl font-extrabold">IT-IMS Portal</h1>
+      <p class="mt-3 text-lg opacity-95">Secure Access • Issue Tracking • Team Collaboration</p>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="p-10 md:p-12">
+
+      <!-- LOGIN -->
+      <div id="loginBox" class="fade">
+        <h2 class="text-4xl font-bold mb-2 text-teal-700">Welcome Back!</h2>
+        <p class="text-gray-600 mb-6 text-lg">Login to continue</p>
+
+        <form id="loginForm" class="space-y-6">
+
+          <!-- email -->
+          <div>
+            <label class="block font-semibold mb-1">Email Address</label>
+            <input id="loginEmail" type="email" placeholder="yourname@gmail.com"
+                   class="w-full border rounded-lg px-4 py-3 text-lg" />
+            <p id="loginEmailError" class="text-red-600 text-sm mt-1 invisible">Email must end with @gmail.com</p>
+          </div>
+
+          <!-- password -->
+          <div>
+            <label class="block font-semibold mb-1">Password</label>
+            <input id="password" type="password" placeholder="Enter password"
+                   class="w-full border rounded-lg px-4 py-3 text-lg" />
+            <p id="pwError" class="text-red-600 text-sm mt-1 invisible">Invalid Password Format</p>
+
+            <!-- checklist (single-line, compact) -->
+            <div id="pwRulesLogin" class="mt-3 flex flex-wrap items-center gap-3">
+              <div id="ruleLoginUpper" class="ruleNew"><div class="dotNew"></div>Uppercase</div>
+              <div id="ruleLoginDigit" class="ruleNew"><div class="dotNew"></div>Digit</div>
+              <div id="ruleLoginSpecial" class="ruleNew"><div class="dotNew"></div>Special char</div>
+              <div id="ruleLoginLen" class="ruleNew"><div class="dotNew"></div>8+ chars</div>
+              <div id="strengthLogin" class="strength">Strength: —</div>
+            </div>
+          </div>
+
+          <!-- role -->
+          <div class="grid grid-cols-2 gap-4">
+            <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer">
+              <input type="radio" name="roleLogin" value="Employee" checked onclick="updateLoginTokenField()" />
+              Employee
+            </label>
+            <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer">
+              <input type="radio" name="roleLogin" value="Technician" onclick="updateLoginTokenField()" />
+              Technician
+            </label>
+          </div>
+
+          <!-- token -->
+          <div>
+            <label id="loginTokenLabel" class="block font-semibold mb-1">Employee Token Number</label>
+            <input id="loginToken" type="text" placeholder="EMP123" class="w-full border rounded-lg px-4 py-3 text-lg" />
+            <p id="loginTokenError" class="text-red-600 text-sm mt-1 invisible"></p>
+          </div>
+
+          <button type="submit" class="w-full bg-teal-600 text-white py-3 rounded-lg text-lg font-semibold">LOG IN</button>
+
+          <p class="text-center text-gray-700 mt-4">
+            Don't have an account?
+            <span class="text-teal-600 font-semibold cursor-pointer" onclick="showSignup()">Create Account</span>
+          </p>
+        </form>
+      </div>
+
+      <!-- SIGNUP -->
+      <div id="signupBox" class="hidden fade">
+        <h2 class="text-4xl font-bold mb-2 text-teal-700">Create Account</h2>
+
+        <form id="signupForm" class="space-y-6">
+
+          <!-- full name -->
+          <div>
+            <label class="block font-semibold mb-1">Full Name</label>
+            <input id="fullName2" type="text" placeholder="Your name" class="w-full border rounded-lg px-4 py-3 text-lg" />
+          </div>
+
+          <!-- email -->
+          <div>
+            <label class="block font-semibold mb-1">Email Address</label>
+            <input id="signupEmail" type="email" placeholder="yourname@gmail.com" class="w-full border rounded-lg px-4 py-3 text-lg" />
+            <p id="signupEmailError" class="text-red-600 text-sm mt-1 invisible">Email must end with @gmail.com</p>
+          </div>
+
+          <!-- password -->
+          <div>
+            <label class="block font-semibold mb-1">Create Password</label>
+            <input id="password2" type="password" placeholder="Create password" class="w-full border rounded-lg px-4 py-3 text-lg" />
+            <p id="pwError2" class="text-red-600 text-sm mt-1 invisible">Invalid Password Format</p>
+
+            <!-- checklist -->
+            <div id="pwRulesSignup" class="mt-3 flex flex-wrap items-center gap-3">
+              <div id="ruleSignupUpper" class="ruleNew"><div class="dotNew"></div>Uppercase</div>
+              <div id="ruleSignupDigit" class="ruleNew"><div class="dotNew"></div>Digit</div>
+              <div id="ruleSignupSpecial" class="ruleNew"><div class="dotNew"></div>Special char</div>
+              <div id="ruleSignupLen" class="ruleNew"><div class="dotNew"></div>8+ chars</div>
+              <div id="strengthSignup" class="strength">Strength: —</div>
+            </div>
+          </div>
+
+          <!-- role -->
+          <div class="grid grid-cols-2 gap-4">
+            <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer">
+              <input type="radio" name="roleSignup" value="Employee" checked onclick="updateSignupTokenField()" />
+              Employee
+            </label>
+            <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer">
+              <input type="radio" name="roleSignup" value="Technician" onclick="updateSignupTokenField()" />
+              Technician
+            </label>
+          </div>
+
+          <!-- token -->
+          <div>
+            <label id="signupTokenLabel" class="block font-semibold mb-1">Employee Token Number</label>
+            <input id="signupToken" type="text" placeholder="EMP123" class="w-full border rounded-lg px-4 py-3 text-lg" />
+            <p id="signupTokenError" class="text-red-600 text-sm mt-1 invisible"></p>
+          </div>
+
+          <button type="submit" class="w-full bg-teal-600 text-white py-3 rounded-lg text-lg font-semibold">SIGN UP</button>
+
+          <p class="text-center text-gray-700 mt-4">
+            Already have an account?
+            <span class="text-teal-600 font-semibold cursor-pointer" onclick="showLogin()">Login here</span>
+          </p>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- popup -->
+  <div id="errorPopup" class="hidden fixed top-6 right-6 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg text-lg font-semibold">❌ Error</div>
+
+  <script src="signup_login.js"></script>
+</body>
+</html>

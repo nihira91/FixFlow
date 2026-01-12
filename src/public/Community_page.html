@@ -18,7 +18,7 @@
         }
       }
     }
-  </script>
+  </script> 
 
   <style>
     body{
@@ -43,6 +43,120 @@
     
     ::-webkit-scrollbar { width:10px; height:10px; }
     ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius:10px;}
+        /* INTERACTIVE UI PACK -------------------------------------------------- */
+
+    /* 3D Hover Tilt */
+    .interactive-card {
+      transition: transform .25s ease, box-shadow .25s ease;
+      will-change: transform;
+    }
+    .interactive-card:hover {
+      transform: perspective(800px) rotateX(4deg) rotateY(-4deg) translateY(-4px);
+      box-shadow: 0 18px 35px rgba(0,0,0,0.18);
+    }
+
+    /* MAGNETIC BUTTONS */
+    .magnetic-btn {
+      position: relative;
+      overflow: hidden;
+      transition: transform .2s ease;
+    }
+    .magnetic-btn:hover {
+      transform: translateY(-3px) scale(1.03);
+    }
+    .magnetic-btn:active {
+      transform: translateY(0px) scale(0.95);
+    }
+
+    /* ACTIVE SIDEBAR NAV */
+    nav a.active {
+      position: relative;
+      color: var(--primary);
+      font-weight: 600;
+    }
+    nav a.active::before {
+      content: "";
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 60%;
+      border-radius: 6px;
+      background: linear-gradient(to bottom, #00b7a8, #009fbe);
+      animation: pulseBar 1.5s infinite ease-in-out;
+    }
+    @keyframes pulseBar {
+      0% { opacity: .3; transform: translateY(-50%) scaleY(.8); }
+      100% { opacity: 1; transform: translateY(-50%) scaleY(1.2); }
+    }
+
+    /* SEARCH EXPAND */
+    #globalSearch { transition: width .3s ease; }
+    #globalSearch:focus {
+      width: 22rem;
+      background: white;
+    }
+
+    /* AVATAR ZOOM */
+    #profileAvatar, #avatarRight, #newAvatar {
+      transition: transform .3s ease;
+    }
+    #profileAvatar:hover, #avatarRight:hover, #newAvatar:hover {
+      transform: scale(1.12);
+    }
+
+    /* TEXTAREA EXPAND */
+    #newPostText {
+      transition: all .3s ease;
+    }
+    #newPostText:focus {
+      height: 120px;
+      background: #ffffffc8;
+    }
+
+    /* COMMENT SLIDE */
+    .commentsArea {
+      animation: slideDown .35s ease both;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* RIPPLE CLICK EFFECT */
+    .ripple {
+      position: relative;
+      overflow: hidden;
+    }
+    .ripple:after {
+      content: "";
+      position: absolute;
+      background: rgba(0,0,0,0.15);
+      border-radius: 50%;
+      width: 10px; height: 10px;
+      transform: scale(0);
+      opacity: 0;
+      transition: transform .5s, opacity .4s;
+    }
+    .ripple:active:after {
+      transform: scale(12);
+      opacity: 1;
+      left: var(--x);
+      top: var(--y);
+    }
+
+    /* LIKE NEON EFFECT */
+    .likeBtn.liked {
+      color: #00b7a8;
+      font-weight: 600;
+      animation: likedFlash .4s ease;
+    }
+    @keyframes likedFlash {
+      from { text-shadow: 0 0 0px #00b7a8; }
+      to   { text-shadow: 0 0 8px #00b7a8; }
+    }
+
   </style>
 </head>
 <body>
@@ -50,6 +164,7 @@
   <!-- TOP BAR -->
   <header class="sticky top-4 z-40 max-w-7xl mx-auto px-6">
     <div class="flex items-center justify-between glass p-3 rounded-xl shadow-sm">
+
       <div class="flex items-center gap-3">
         <div class="px-3 py-2 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-bold">🛠️</div>
         <div>
@@ -61,6 +176,7 @@
       <div class="flex items-center gap-3">
         <input id="globalSearch" type="search" placeholder="Search feed, users, issues..." 
                class="px-4 py-2 rounded-full border border-gray-200 w-80 focus:ring-2 focus:ring-primary">
+
         <div id="profileBadge" class="flex items-center gap-3 px-3 py-2 rounded-lg">
           <div id="profileAvatar" class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary text-white flex items-center justify-center font-bold">A</div>
           <div class="text-sm">
@@ -79,20 +195,20 @@
     <aside class="w-64 flex-shrink-0">
       <div class="glass p-4 rounded-2xl shadow-sm animate-fadeUp">
         <nav class="space-y-3">
-          <a class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/30 transition"><span>🏠</span> Dashboard</a>
-          <a class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/30 transition"><span>📣</span> Issue Feed</a>
-          <a class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/30 transition"><span>💬</span> Chats</a>
-          <a class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/30 transition"><span>👥</span> Teams</a>
-          <a class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/30 transition"><span>🧾</span> My Tasks</a>
+          <a class="flex items-center gap-3 p-2 rounded-lg active"><span>🏠</span> Dashboard</a>
+          <a class="flex items-center gap-3 p-2 rounded-lg ripple transition"><span>📣</span> Issue Feed</a>
+          <a class="flex items-center gap-3 p-2 rounded-lg ripple transition"><span>💬</span> Chats</a>
+          <a class="flex items-center gap-3 p-2 rounded-lg ripple transition"><span>👥</span> Teams</a>
+          <a class="flex items-center gap-3 p-2 rounded-lg ripple transition"><span>🧾</span> My Tasks</a>
         </nav>
       </div>
 
-      <div class="mt-4 glass p-4 rounded-2xl shadow-sm animate-fadeUp">
+      <div class="mt-4 glass p-4 rounded-2xl shadow-sm animate-fadeUp interactive-card">
         <div class="text-sm text-gray-700 font-semibold mb-2">Quick Connect</div>
         <div class="space-y-2">
-          <button class="w-full text-left px-3 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-white transform transition hover:-translate-y-1">Technician Team</button>
-          <button class="w-full text-left px-3 py-2 rounded-lg border">Admin Group</button>
-          <button class="w-full text-left px-3 py-2 rounded-lg border">Employees</button>
+          <button class="w-full text-left px-3 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-white magnetic-btn ripple">Technician Team</button>
+          <button class="w-full text-left px-3 py-2 rounded-lg border magnetic-btn ripple">Admin Group</button>
+          <button class="w-full text-left px-3 py-2 rounded-lg border magnetic-btn ripple">Employees</button>
         </div>
       </div>
     </aside>
@@ -101,7 +217,7 @@
     <section class="flex-1">
 
       <!-- NEW POST -->
-      <div class="glass p-5 rounded-2xl shadow-sm mb-6 animate-fadeUp">
+      <div class="glass p-5 rounded-2xl shadow-sm mb-6 animate-fadeUp interactive-card">
         <div class="flex items-start gap-4">
           <div id="newAvatar" class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">A</div>
           <div class="flex-1">
@@ -114,8 +230,8 @@
                 <label class="flex items-center gap-2"><input id="postPublic" type="checkbox" checked> Public</label>
               </div>
               <div class="flex items-center gap-3">
-                <button id="attachBtn" class="px-3 py-2 rounded-lg border">Attach</button>
-                <button id="postBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:shadow-lg transform transition hover:-translate-y-0.5">Post</button>
+                <button id="attachBtn" class="px-3 py-2 rounded-lg magnetic-btn ripple">Attach</button>
+                <button id="postBtn" class="px-4 py-2 bg-primary text-white rounded-lg magnetic-btn ripple">Post</button>
               </div>
             </div>
           </div>
@@ -210,6 +326,6 @@
     </article>
   </template>
 
-  <script defer src="interaction-dashboard.js"></script>
+  <script defer src="Community_page.js"></script>
 </body>
 </html>
