@@ -162,14 +162,13 @@
 
             <!-- Navigation -->
             <nav class="flex flex-col space-y-3 text-gray-700 font-medium">
-                <a class="p-2 rounded-lg bg-primary/20 text-primary ">Dashboard</a>
-                <a class="p-2 rounded-lg transition">Assigned Tasks</a>
-                <a class="p-2 rounded-lg transition">Live Issues</a>
-                <!-- <a class="p-2 rounded-lg text-orange-600 font-semibold transition">
-                    Technician Verification -->
-                </a>
-                <a class="p-2 rounded-lg transition">My Profile</a>
-                <a class="p-2 rounded-lg text-red-500 transition">Logout</a>
+                <a href="index.html" class="p-2 rounded-lg transition hover:bg-gray-100">🏠 Home</a>
+                <a href="#" class="p-2 rounded-lg bg-primary/20 text-primary ">Dashboard</a>
+                <a href="#" class="p-2 rounded-lg transition">Assigned Tasks</a>
+                <a href="#" class="p-2 rounded-lg transition">Live Issues</a>
+                <a href="Community_page.html" class="p-2 rounded-lg transition">Community</a>
+                <a href="#" class="p-2 rounded-lg transition">My Profile</a>
+                <a href="#" class="p-2 rounded-lg text-red-500 transition">Logout</a>
             </nav>
         </aside>
 
@@ -219,17 +218,85 @@
 
         <div class="p-6 bg-white/70 backdrop-blur-lg rounded-xl shadow-lg text-center card-hover">
             <h3 class="text-gray-700 text-lg font-semibold">Tasks Assigned</h3>
-            <p class="text-3xl font-bold text-blue-600 mt-2">7</p>
+            <p class="text-3xl font-bold text-blue-600 mt-2" id="tasksAssigned">-</p>
         </div>
 
         <div class="p-6 bg-white/70 backdrop-blur-lg rounded-xl shadow-lg text-center card-hover">
             <h3 class="text-gray-700 text-lg font-semibold">Tasks In Progress</h3>
-            <p class="text-3xl font-bold text-yellow-500 mt-2">3</p>
+            <p class="text-3xl font-bold text-yellow-500 mt-2" id="tasksInProgress">-</p>
         </div>
 
         <div class="p-6 bg-white/70 backdrop-blur-lg rounded-xl shadow-lg text-center card-hover">
             <h3 class="text-gray-700 text-lg font-semibold">Completed Tasks</h3>
-            <p class="text-3xl font-bold text-green-600 mt-2">12</p>
+            <p class="text-3xl font-bold text-green-600 mt-2" id="tasksCompleted">-</p>
+        </div>
+    </div>
+
+    <!-- ASSIGNED ISSUES SECTION -->
+    <div class="bg-white/70 backdrop-blur-xl p-8 rounded-2xl shadow-xl border border-gray-200 mb-10">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+            <span>📋</span> Your Assigned Issues
+        </h2>
+        <div id="assignedIssuesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <p class="text-gray-500 text-center py-12 col-span-full">Loading your assigned issues...</p>
+        </div>
+    </div>
+
+    <!-- ISSUE DETAIL MODAL -->
+    <div id="issueModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto">
+            <!-- Close Button -->
+            <button id="closeModalBtn" class="float-right text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+            
+            <!-- Issue Title -->
+            <h2 id="modalTitle" class="text-3xl font-bold text-gray-900 mb-4 pr-8">Issue Title</h2>
+            
+            <!-- Status Badge -->
+            <div class="mb-6">
+                <span id="modalStatus" class="px-4 py-2 rounded-full font-bold text-sm">Status</span>
+            </div>
+            
+            <!-- Issue Details Section -->
+            <div class="grid grid-cols-2 gap-6 mb-8">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold mb-1">Category</p>
+                    <p id="modalCategory" class="text-lg text-gray-900 font-bold">-</p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold mb-1">Priority</p>
+                    <p id="modalPriority" class="text-lg text-gray-900 font-bold">-</p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold mb-1">Location</p>
+                    <p id="modalLocation" class="text-lg text-gray-900 font-bold">-</p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold mb-1">Created</p>
+                    <p id="modalCreated" class="text-lg text-gray-900 font-bold">-</p>
+                </div>
+            </div>
+            
+            <!-- Description -->
+            <div class="mb-8">
+                <p class="text-gray-600 text-sm font-semibold mb-2">Description</p>
+                <p id="modalDescription" class="text-gray-700 leading-relaxed">-</p>
+            </div>
+            
+            <!-- Reporter Details Section -->
+            <div class="border-t-2 border-gray-200 pt-6 mb-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">👤 Reported By</h3>
+                <div id="reporterSection" class="bg-gradient-to-r from-primary/10 to-secondary/10 p-6 rounded-2xl border-2 border-primary/20">
+                    <p class="text-center text-gray-600 py-4">Loading reporter info...</p>
+                </div>
+            </div>
+            
+            <!-- Progress Timeline -->
+            <div class="border-t-2 border-gray-200 pt-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">📈 Progress Timeline</h3>
+                <div id="timelineContainer" class="space-y-4">
+                    <p class="text-gray-500 text-center py-4">No progress updates yet</p>
+                </div>
+            </div>
         </div>
     </div>
     <!-- TASK TABLE -->

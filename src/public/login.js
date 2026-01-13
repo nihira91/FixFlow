@@ -1,86 +1,69 @@
-// console.log("login.js loaded");
-
-// const form = document.getElementById("loginForm");
-
-// form.addEventListener("submit", async (e) => {
-//   e.preventDefault();
-
-//   const email = document.getElementById("email").value;
-//   const password = document.getElementById("password").value;
-
-//   const response = await fetch("http://localhost:5000/api/employee/auth/login", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({ email, password })
-//   });
-
-//   const data = await response.json();
-//   console.log("LOGIN RESPONSE:", data);
-
-//   if (!response.ok) {
-//     alert(data.message || "Login failed");
-//     return;
-//   }
-
-//   localStorage.setItem("token", data.token);
-//   localStorage.setItem("user", JSON.stringify(data.user));
-//   window.location.href = "employee.html";
-
-
-//   const userRole = data.user.role.toLowerCase();
-
-//   if (userRole === "employee") {
-//     window.location.replace("./Employee.html");
-//   } else if (userRole === "technician") {
-//     window.location.replace("./Technician.html");
-//   } else if (userRole === "admin") {
-//     window.location.replace("./Admin.html");
-//   }
-// });
-
-console.log("login.js loaded");
+console.log("🔐 login.js LOADED");
 
 const form = document.getElementById("loginForm");
+const emailField = document.getElementById("email");
+const passwordField = document.getElementById("password");
+const errorMsg = document.getElementById("errorMsg");
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const email = emailField.value.trim();
+  const password = passwordField.value.trim();
+  const role = document.querySelector('input[name="role"]:checked').value;
 
-  const role = document
-    .querySelector('input[name="role"]:checked')
-    .value
-    .toLowerCase();
-
-  console.log("🔥 ROLE:", role);
+  if (!email || !password) {
+    showError("Email and password are required");
+    return;
+  }
 
   const API_URL =
     role === "technician"
       ? "http://localhost:5000/api/technician/auth/login"
       : "http://localhost:5000/api/employee/auth/login";
 
-  console.log("🔥 API:", API_URL);
+  try {
+    errorMsg.classList.add("hidden");
 
-  const response = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        password
+      })
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if (!response.ok) {
-    alert(data.message || "Login failed");
-    return;
-  }
+    if (response.ok) {
+      // Store token and user data
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-  localStorage.setItem("token", data.token);
-  localStorage.setItem("user", JSON.stringify(data.user));
-
-  if (data.user.role === "employee") {
-    window.location.replace("./Employee.html");
-  } else if (data.user.role === "technician") {
-    window.location.replace("./Technician.html");
+      // Redirect based on role and profile status
+      if (role === "technician") {
+        if (data.user.profileCompleted) {
+          // Profile complete, go to dashboard
+          window.location.href = "Technician.html";
+        } else {
+          // Profile not complete, go to completion page
+          window.location.href = "technician-profile-completion.html";
+        }
+      } else {
+        // Employee dashboard
+        window.location.href = "Employee.html";
+      }
+    } else {
+      showError(data.message || "Login failed");
+    }
+  } catch (err) {
+    console.error("Login error:", err);
+    showError("Server not responding. Please try again.");
   }
 });
+
+function showError(message) {
+  errorMsg.textContent = message;
+  errorMsg.classList.remove("hidden");
+}

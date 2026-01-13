@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Issues | FixFlow IMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#00b7a8",
+            secondary: "#009fbe",
+            glassWhite: "rgba(255,255,255,0.65)",
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #e7fdf9, #f1faff, #ffffff);
+    }
+
+    aside nav a {
+      transition: 0.25s ease;
+    }
+
+    aside nav a:hover {
+      transform: translateX(6px);
+      background: rgba(0, 183, 168, 0.15) !important;
+      color: #009fbe !important;
+    }
+
+    .issue-card {
+      transition: 0.25s ease;
+    }
+
+    .issue-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .pulse-red {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      background-color: rgb(239, 68, 68);
+    }
+  </style>
+
+  <script defer src="live_issues.js"></script>
+</head>
+
+<body>
+
+<div class="flex">
+  <!-- SIDEBAR -->
+  <aside class="w-64 min-h-screen bg-glassWhite backdrop-blur-xl shadow-xl p-6 border-r border-white/20">
+
+    <!-- Logo -->
+    <div class="flex items-center space-x-3 mb-10">
+      <div class="bg-gradient-to-r from-primary to-secondary p-3 rounded-xl text-white text-xl">
+        🔧
+      </div>
+      <h1 class="text-xl font-bold text-gray-800">FixFlow IMS</h1>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex flex-col space-y-3 text-gray-700 font-medium">
+      <a href="index.html" class="p-2 rounded-lg transition hover:bg-gray-100">🏠 Home</a>
+      <a href="#" class="p-2 rounded-lg transition">Dashboard</a>
+      <a href="#" class="p-2 rounded-lg transition">Assigned Tasks</a>
+      <a href="#" class="p-2 rounded-lg bg-primary/20 text-primary">Live Issues</a>
+      <a href="#" class="p-2 rounded-lg transition">My Profile</a>
+      <a href="#" class="p-2 rounded-lg text-red-500 transition">Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 p-10">
+
+    <!-- HEADER -->
+    <div class="flex items-center gap-4 mb-8">
+      <button id="backBtn" class="px-3 py-2 bg-white text-primary rounded-lg hover:bg-gray-100 transition flex items-center gap-2 shadow">
+        ← Back
+      </button>
+      <div class="bg-gradient-to-r from-secondary to-primary text-white p-6 rounded-xl shadow-lg flex-1">
+        <h2 class="text-3xl font-bold">Live Issues 🚨</h2>
+        <p class="text-white/90 mt-2">All unresolved issues in real-time</p>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="bg-white/70 backdrop-blur-lg p-4 rounded-xl shadow-lg mb-6 flex gap-3 flex-wrap">
+      <button class="priority-filter px-4 py-2 rounded-lg bg-primary/20 text-primary font-medium transition" data-priority="">
+        All Issues
+      </button>
+      <button class="priority-filter px-4 py-2 rounded-lg hover:bg-red-100 text-red-700 font-medium transition" data-priority="Critical">
+        🔴 Critical
+      </button>
+      <button class="priority-filter px-4 py-2 rounded-lg hover:bg-orange-100 text-orange-700 font-medium transition" data-priority="Urgent">
+        🟠 Urgent
+      </button>
+      <button class="priority-filter px-4 py-2 rounded-lg hover:bg-yellow-100 text-yellow-700 font-medium transition" data-priority="Routine">
+        🟡 Routine
+      </button>
+    </div>
+
+    <!-- ISSUES GRID -->
+    <div id="issuesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="p-6 bg-white/70 rounded-xl text-center text-gray-600">
+        <p>Loading live issues...</p>
+      </div>
+    </div>
+
+    <!-- ISSUE DETAIL MODAL -->
+    <div id="issueModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto">
+            <!-- Close Button -->
+            <button id="closeModalBtn" class="float-right text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+            
+            <!-- Issue Title -->
+            <h2 id="modalTitle" class="text-3xl font-bold text-gray-900 mb-4 pr-8">Issue Title</h2>
+            
+            <!-- Status Badge -->
+            <div class="mb-6">
+                <span id="modalStatus" class="px-4 py-2 rounded-full font-bold text-sm">Status</span>
+            </div>
+            
+            <!-- Issue Details Section -->
+            <div class="grid grid-cols-2 gap-6 mb-8">
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold mb-1">Category</p>
+                    <p id="modalCategory" class="text-lg text-gray-900 font-bold">-</p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold mb-1">Priority</p>
+                    <p id="modalPriority" class="text-lg text-gray-900 font-bold">-</p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold mb-1">Created</p>
+                    <p id="modalCreated" class="text-lg text-gray-900 font-bold">-</p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm font-semibold mb-1">Last Updated</p>
+                    <p id="modalUpdated" class="text-lg text-gray-900 font-bold">-</p>
+                </div>
+            </div>
+            
+            <!-- Description -->
+            <div class="mb-8">
+                <p class="text-gray-600 text-sm font-semibold mb-2">Description</p>
+                <p id="modalDescription" class="text-gray-700 leading-relaxed">-</p>
+            </div>
+            
+            <!-- Reporter Details Section -->
+            <div class="border-t-2 border-gray-200 pt-6 mb-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">👤 Reported By</h3>
+                <div id="reporterSection" class="bg-gradient-to-r from-primary/10 to-secondary/10 p-6 rounded-2xl border-2 border-primary/20">
+                    <p class="text-center text-gray-600 py-4">Loading reporter info...</p>
+                </div>
+            </div>
+            
+            <!-- Progress Timeline -->
+            <div class="border-t-2 border-gray-200 pt-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">📈 Progress Timeline</h3>
+                <div id="timelineContainer" class="space-y-4">
+                    <p class="text-gray-500 text-center py-4">No progress updates yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center text-gray-600 mt-8">
+      FixFlow IMS © 2025 — Live Issues
+    </footer>
+
+  </main>
+
+  <script>
+    // Back to Dashboard functionality
+    document.getElementById("backBtn").addEventListener("click", () => {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (user.role === "technician") {
+        window.location.href = "Technician.html";
+      } else {
+        window.location.href = "Employee.html";
+      }
+    });
+  </script>
+</div>
+
+</body>
+
+</html>

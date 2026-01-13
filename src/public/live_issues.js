@@ -1,9 +1,8 @@
-console.log("🔧 Technician Dashboard Loaded");
+console.log("🚨 Live Issues Page Loaded");
 
 const API_BASE = "http://localhost:5000/api";
 const token = localStorage.getItem("token");
 const user = JSON.parse(localStorage.getItem("user") || "{}");
-let allIssues = [];
 
 // Check authentication
 if (!token || !user.id) {
@@ -11,12 +10,14 @@ if (!token || !user.id) {
   window.location.href = "login.html";
 }
 
+let allIssues = [];
+
 // ==========================================
-// REAL-TIME DATA LOADING
+// LOAD ALL OPEN ISSUES
 // ==========================================
-async function loadDashboardData() {
+async function loadLiveIssues() {
   try {
-    const response = await fetch(`${API_BASE}/technician/issues/assigned`, {
+    const response = await fetch(`${API_BASE}/employee/issues/live`, {
       headers: { "Authorization": `Bearer ${token}` }
     });
 
@@ -28,89 +29,121 @@ async function loadDashboardData() {
     const data = await response.json();
     allIssues = data.issues || [];
 
-    // Calculate statistics
-    const tasksAssigned = allIssues.length;
-    const tasksInProgress = allIssues.filter(i => i.status === 'in-progress').length;
-    const completedTasks = allIssues.filter(i => i.status === 'resolved' || i.status === 'closed').length;
-
-    // Update dashboard numbers
-    updateDashboard(tasksAssigned, tasksInProgress, completedTasks);
-    
-    // Display assigned issues
-    displayAssignedIssues();
+    console.log(`Loaded ${allIssues.length} live issues`);
+    displayIssues(allIssues);
 
   } catch (error) {
-    console.error("Error loading dashboard data:", error);
+    console.error("Error loading live issues:", error);
   }
 }
 
-function updateDashboard(assigned, inProgress, completed) {
-  // Update by element ID
-  const assignedEl = document.getElementById('tasksAssigned');
-  const inProgressEl = document.getElementById('tasksInProgress');
-  const completedEl = document.getElementById('tasksCompleted');
-  
-  if (assignedEl) assignedEl.textContent = assigned;
-  if (inProgressEl) inProgressEl.textContent = inProgress;
-  if (completedEl) completedEl.textContent = completed;
-
-  console.log(`✅ Dashboard updated: ${assigned} assigned, ${inProgress} in progress, ${completed} completed`);
-}
-
 // ==========================================
-// DISPLAY ASSIGNED ISSUES
+// DISPLAY ISSUES
 // ==========================================
-function displayAssignedIssues() {
-  const container = document.getElementById('assignedIssuesContainer');
-  if (!container) return;
+function displayIssues(issues) {
+  const container = document.getElementById("issuesContainer");
 
-  if (allIssues.length === 0) {
-    container.innerHTML = '<p class="text-gray-500 text-center py-12 col-span-full">No assigned issues at the moment</p>';
+  if (issues.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full p-10 bg-white/70 rounded-xl text-center">
+        <p class="text-gray-600 text-lg">✨ No live issues!</p>
+        <p class="text-gray-500 text-sm mt-2">All issues have been resolved.</p>
+      </div>
+    `;
     return;
   }
 
-  container.innerHTML = allIssues.map(issue => {
-    const statusColors = {
-      'open': 'bg-yellow-100 text-yellow-800',
-      'assigned': 'bg-blue-100 text-blue-800',
-      'in-progress': 'bg-purple-100 text-purple-800',
-      'resolved': 'bg-green-100 text-green-800',
-      'closed': 'bg-gray-100 text-gray-800'
-    };
-    
-    const priorityColors = {
-      'Critical': 'bg-red-50 text-red-700 border-l-4 border-red-500',
-      'Urgent': 'bg-orange-50 text-orange-700 border-l-4 border-orange-500',
-      'Routine': 'bg-yellow-50 text-yellow-700 border-l-4 border-yellow-500',
-      'Risky': 'bg-purple-50 text-purple-700 border-l-4 border-purple-500'
+  container.innerHTML = issues.map(issue => {
+    const priorityStyles = {
+      'Critical': { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-300', icon: '🔴' },
+      'Urgent': { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-300', icon: '🟠' },
+      'Routine': { bg: 'bg-yellow-50', text: 'text-yellow-700', border: 'border-yellow-300', icon: '🟡' },
+      'Risky': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-300', icon: '🔵' }
     };
 
-    const statusClass = statusColors[issue.status] || 'bg-gray-100 text-gray-800';
-    const priorityClass = priorityColors[issue.priority] || 'bg-gray-50 text-gray-700 border-l-4 border-gray-500';
-    const date = new Date(issue.createdAt).toLocaleDateString();
-    
+    const style = priorityStyles[issue.priority] || priorityStyles['Routine'];
+
+    const statusBadge = issue.status === 'assigned' 
+      ? '<span class="px-3 py-1 text-sm font-medium rounded-full bg-green-50 text-green-700">✓ Assigned</span>'
+      : '<span class="px-3 py-1 text-sm font-medium rounded-full bg-yellow-50 text-yellow-700 pulse-red">🔔 Open</span>';
+
+    const createdDate = new Date(issue.createdAt).toLocaleDateString('en-IN');
+
     return `
-      <div class="p-6 rounded-xl shadow-lg ${priorityClass} hover:shadow-xl transition cursor-pointer">
-        <div class="flex justify-between items-start mb-3">
-          <h4 class="font-bold text-lg">${issue.title}</h4>
-          <span class="px-3 py-1 rounded-full text-xs font-bold ${statusClass} capitalize">${issue.status}</span>
+      <div class="issue-card bg-white rounded-xl shadow-lg p-6 border-l-4 ${style.border}">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-start mb-4">
+          <div class="flex-1">
+            <h3 class="font-bold text-lg text-gray-800">${escapeHtml(issue.title)}</h3>
+            <p class="text-gray-600 text-sm mt-1">📍 ${escapeHtml(issue.location)}</p>
+          </div>
+          ${statusBadge}
         </div>
-        
-        <p class="text-sm mb-3 opacity-90">📍 ${issue.location}</p>
-        
-        <div class="flex gap-2 mb-4">
-          <span class="px-2 py-1 bg-white/50 rounded text-xs font-medium">🏷️ ${issue.category}</span>
-          <span class="px-2 py-1 bg-white/50 rounded text-xs font-medium">⚡ ${issue.priority}</span>
+
+        <!-- Description -->
+        <p class="text-gray-700 text-sm mb-4">${escapeHtml(issue.description.substring(0, 100))}${issue.description.length > 100 ? '...' : ''}</p>
+
+        <!-- Category & Priority -->
+        <div class="flex gap-3 mb-4 flex-wrap">
+          <span class="px-2 py-1 bg-teal-50 text-teal-700 text-xs rounded-lg font-medium">
+            🏷️ ${escapeHtml(issue.category)}
+          </span>
+          <span class="px-2 py-1 ${style.bg} ${style.text} text-xs rounded-lg font-medium">
+            ${style.icon} ${escapeHtml(issue.priority)}
+          </span>
         </div>
-        
-        <p class="text-xs opacity-75 mb-4">📅 ${date}</p>
-        
-        <button onclick="viewIssueDetails('${issue._id}')" class="w-full py-2 bg-white/20 hover:bg-white/30 rounded-lg transition font-medium text-sm">
+
+        <!-- Assigned To -->
+        ${issue.assignedTechnician ? `
+          <p class="text-gray-600 text-sm mb-4">
+            👨‍🔧 Assigned to: <strong>${escapeHtml(issue.assignedTechnician.name)}</strong>
+          </p>
+        ` : '<p class="text-gray-500 text-sm mb-4">⏳ Waiting for assignment...</p>'}
+
+        <!-- Date -->
+        <p class="text-gray-500 text-xs mb-4">📅 ${createdDate}</p>
+
+        <!-- Action Button -->
+        <button onclick="viewIssueDetails('${issue._id}')" class="w-full py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:opacity-90 transition font-medium">
           View Details →
         </button>
       </div>
     `;
   }).join('');
+}
+
+// ==========================================
+// PRIORITY FILTER
+// ==========================================
+function setupFilters() {
+  const filterButtons = document.querySelectorAll(".priority-filter");
+
+  filterButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      // Remove active state from all buttons
+      filterButtons.forEach(b => {
+        b.classList.remove("bg-primary/20", "text-primary");
+        b.classList.add("hover:bg-gray-100");
+      });
+
+      // Add active state to clicked button
+      btn.classList.add("bg-primary/20", "text-primary");
+      btn.classList.remove("hover:bg-gray-100");
+
+      const priority = btn.getAttribute("data-priority");
+      filterByPriority(priority);
+    });
+  });
+}
+
+function filterByPriority(priority) {
+  if (!priority) {
+    displayIssues(allIssues);
+  } else {
+    const filtered = allIssues.filter(issue => issue.priority === priority);
+    displayIssues(filtered);
+  }
 }
 
 // ==========================================
@@ -126,9 +159,9 @@ function viewIssueDetails(issueId) {
   document.getElementById('modalTitle').textContent = issue.title;
   document.getElementById('modalCategory').textContent = issue.category || '-';
   document.getElementById('modalPriority').textContent = issue.priority || '-';
-  document.getElementById('modalLocation').textContent = issue.location || '-';
   document.getElementById('modalDescription').textContent = issue.description || '-';
   document.getElementById('modalCreated').textContent = new Date(issue.createdAt).toLocaleDateString();
+  document.getElementById('modalUpdated').textContent = new Date(issue.updatedAt).toLocaleDateString();
   
   // Status badge
   const statusColors = {
@@ -201,24 +234,23 @@ function viewIssueDetails(issueId) {
 // ==========================================
 function setupNavigation() {
   const navLinks = document.querySelectorAll('aside nav a');
-  
+
   navLinks.forEach(link => {
     link.style.cursor = 'pointer';
-    
+
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const text = link.textContent.trim();
-      
+
       switch(text) {
         case 'Dashboard':
-          // Already on dashboard, reload data
-          loadDashboardData();
+          window.location.href = 'Technician.html';
           break;
         case 'Assigned Tasks':
           window.location.href = 'assigned-tasks.html';
           break;
         case 'Live Issues':
-          window.location.href = 'live_issues.html';
+          // Already on this page
           break;
         case 'My Profile':
           window.location.href = 'profile.html';
@@ -239,11 +271,24 @@ function logout() {
 }
 
 // ==========================================
+// HELPER FUNCTIONS
+// ==========================================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ==========================================
 // INITIALIZATION
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🔧 Initializing Technician Dashboard...");
-  
+  console.log("🚨 Initializing Live Issues Page...");
+
+  loadLiveIssues();
+  setupFilters();
+  setupNavigation();
+
   // Modal close button handler
   const closeBtn = document.getElementById('closeModalBtn');
   const issueModal = document.getElementById('issueModal');
@@ -265,17 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-  
-  // Load data every 5 seconds for real-time updates
-  loadDashboardData();
-  setInterval(loadDashboardData, 5000);
-  
-  // Setup navigation
-  setupNavigation();
-  
-  // Display technician name
-  const header = document.querySelector('h2');
-  if (header && user.name) {
-    header.textContent = `Welcome, ${user.name} 👨‍🔧`;
-  }
+
+  // Reload every 3 seconds for real-time updates
+  setInterval(loadLiveIssues, 3000);
 });

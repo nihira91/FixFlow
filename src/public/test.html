@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Technician Auth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
+        <h1 class="text-2xl font-bold mb-4">Test Technician Auth</h1>
+        
+        <div class="mb-6 p-4 bg-blue-100 rounded">
+            <h2 class="font-bold mb-2">Test Signup</h2>
+            <button onclick="testSignup()" class="bg-blue-500 text-white px-4 py-2 rounded">
+                Signup Test Technician
+            </button>
+            <pre id="signupResult" class="mt-2 text-sm bg-gray-100 p-2 rounded"></pre>
+        </div>
+
+        <div class="mb-6 p-4 bg-green-100 rounded">
+            <h2 class="font-bold mb-2">Test Login</h2>
+            <button onclick="testLogin()" class="bg-green-500 text-white px-4 py-2 rounded">
+                Login Test Technician
+            </button>
+            <pre id="loginResult" class="mt-2 text-sm bg-gray-100 p-2 rounded"></pre>
+        </div>
+    </div>
+
+    <script>
+        let testEmail = 'tech@test.com';
+        let testPassword = 'TechPass123!';
+
+        async function testSignup() {
+            const result = document.getElementById('signupResult');
+            result.textContent = 'Loading...';
+            
+            try {
+                testEmail = 'tech' + Date.now() + '@test.com';
+                const response = await fetch('/api/technician/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Test Tech ' + Date.now(),
+                        email: testEmail,
+                        password: testPassword
+                    })
+                });
+                
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2) + '\n\n✅ Email stored for login test: ' + testEmail;
+                result.style.color = response.ok ? 'green' : 'red';
+            } catch (err) {
+                result.textContent = 'Error: ' + err.message;
+                result.style.color = 'red';
+            }
+        }
+
+        async function testLogin() {
+            const result = document.getElementById('loginResult');
+            result.textContent = 'Loading...';
+            
+            try {
+                const response = await fetch('/api/technician/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: testEmail,
+                        password: testPassword
+                    })
+                });
+                
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2) + '\n\n📧 Login email used: ' + testEmail;
+                result.style.color = response.ok ? 'green' : 'red';
+            } catch (err) {
+                result.textContent = 'Error: ' + err.message;
+                result.style.color = 'red';
+            }
+        }
+    </script>
+</body>
+</html>

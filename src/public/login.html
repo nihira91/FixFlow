@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IT-IMS — Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-xl grid grid-cols-1 md:grid-cols-2 overflow-hidden">
+        
+        <!-- LEFT SECTION -->
+        <div class="bg-teal-500 text-white p-10 flex flex-col justify-center">
+            <div class="text-5xl mb-6">🔐</div>
+            <h1 class="text-3xl font-bold">Welcome Back</h1>
+            <p class="mt-3 text-lg opacity-90">
+                Login to access your IT-IMS account and manage issues efficiently.
+            </p>
+            <div class="mt-8">
+                <p class="text-sm opacity-75">Don't have an account?</p>
+                <a href="signup.html" class="text-white font-semibold mt-2 inline-block hover:underline">
+                    Create one →
+                </a>
+            </div>
+        </div>
+
+        <!-- RIGHT SECTION -->
+        <div class="p-10">
+            <h2 class="text-3xl font-bold mb-2">Sign In</h2>
+            <p class="text-gray-600 mb-6">Enter your credentials</p>
+
+            <form id="loginForm" class="space-y-5">
+
+                <!-- ROLE SELECTION -->
+                <div class="flex items-center gap-6 mb-6">
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="role" value="employee" class="accent-teal-600" checked>
+                        <span>Employee</span>
+                    </label>
+
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="role" value="technician" class="accent-teal-600">
+                        <span>Technician</span>
+                    </label>
+                </div>
+
+                <!-- EMAIL -->
+                <div>
+                    <label class="block font-semibold mb-1">Email Address</label>
+                    <input 
+                        id="email"
+                        type="email"
+                        required
+                        placeholder="name@company.com"
+                        class="w-full border rounded-lg px-4 py-2 focus:ring-teal-500 focus:border-teal-500"
+                    />
+                </div>
+
+                <!-- PASSWORD -->
+                <div>
+                    <label class="block font-semibold mb-1">Password</label>
+                    <input 
+                        id="password"
+                        type="password"
+                        required
+                        placeholder="Enter your password"
+                        class="w-full border rounded-lg px-4 py-2 focus:ring-teal-500 focus:border-teal-500"
+                    />
+                </div>
+
+                <!-- ERROR MESSAGE -->
+                <div id="errorMsg" class="hidden bg-red-50 border border-red-200 rounded-lg p-3 text-red-800 text-sm">
+                </div>
+
+                <!-- SUBMIT -->
+                <button 
+                    type="submit"
+                    class="w-full bg-teal-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-teal-700 transition"
+                >
+                    LOGIN
+                </button>
+
+                <p class="mt-3 text-sm text-gray-600 text-center">
+                    <a href="#" class="text-teal-600 font-semibold">Forgot Password?</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>

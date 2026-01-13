@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Complete Profile - IT-IMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-10">
+        
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-teal-600">Complete Your Profile</h1>
+            <p class="text-gray-600 mt-2">Add your specialization and availability details</p>
+        </div>
+
+        <form id="profileForm" class="space-y-6">
+
+            <!-- CATEGORY/SPECIALIZATION -->
+            <div>
+                <label class="block font-semibold mb-2 text-lg">Specialization Category</label>
+                <select 
+                    id="category"
+                    required
+                    class="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:ring-teal-500 focus:border-teal-500 text-lg"
+                >
+                    <option value="">Select your category</option>
+                    <option value="Electrical">🔌 Electrical</option>
+                    <option value="Plumbing">🔧 Plumbing</option>
+                    <option value="HVAC">❄️ HVAC (Heating/Cooling)</option>
+                    <option value="Network">🌐 Network/IT</option>
+                    <option value="Maintenance">🛠️ Maintenance</option>
+                    <option value="Security">🔐 Security</option>
+                    <option value="Other">📌 Other</option>
+                </select>
+            </div>
+
+            <!-- MAX CAPACITY -->
+            <div>
+                <label class="block font-semibold mb-2 text-lg">Maximum Issues You Can Handle</label>
+                <input 
+                    id="maxCapacity"
+                    type="number"
+                    value="10"
+                    min="1"
+                    max="50"
+                    class="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:ring-teal-500 focus:border-teal-500 text-lg"
+                />
+                <p class="text-sm text-gray-500 mt-1">Default: 10 issues</p>
+            </div>
+
+            <!-- INFO MESSAGE -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p class="text-sm text-blue-800">
+                    <strong>📌 Note:</strong> You will be automatically assigned issues matching your category. 
+                    You'll receive notifications when new issues are assigned to you.
+                </p>
+            </div>
+
+            <!-- SUBMIT -->
+            <button 
+                type="submit"
+                class="w-full bg-teal-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-teal-700 transition"
+            >
+                COMPLETE PROFILE
+            </button>
+
+            <p class="mt-3 text-sm text-gray-600 text-center">
+                <a href="login.html" class="text-teal-600 font-semibold">Go to Login</a>
+            </p>
+        </form>
+
+        <div id="loading" class="hidden text-center text-gray-600 text-lg">
+            <p>Saving your profile...</p>
+        </div>
+
+        <div id="error" class="hidden bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
+        </div>
+
+    </div>
+
+    <script src="technician-profile-completion.js"></script>
+</body>
+</html>

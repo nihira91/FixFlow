@@ -51,6 +51,17 @@
                     />
                 </div>
 
+                <!-- CONTACT NUMBER (shown only for technicians) -->
+                <div id="contactDiv" class="hidden">
+                    <label class="block font-semibold mb-1">Contact Number</label>
+                    <input 
+                        id="contactNo"
+                        type="tel"
+                        placeholder="+91 98765 43210"
+                        class="w-full border rounded-lg px-4 py-2 focus:ring-teal-500 focus:border-teal-500"
+                    />
+                </div>
+
                 <!-- PASSWORD -->
                 <div>
                     <label class="block font-semibold mb-1">Password</label>
@@ -81,12 +92,12 @@
                 <!-- ROLE SELECTION -->
                 <div class="flex items-center gap-6">
                     <label class="flex items-center gap-2">
-                        <input type="radio" name="role" value="employee" class="accent-teal-600" checked>
+                        <input type="radio" name="role" value="employee" class="accent-teal-600" checked onchange="toggleContactField()">
                         Employee
                     </label>
 
                     <label class="flex items-center gap-2">
-                        <input type="radio" name="role" value="technician" class="accent-teal-600">
+                        <input type="radio" name="role" value="technician" class="accent-teal-600" onchange="toggleContactField()">
                         Technician
                     </label>
                 </div>

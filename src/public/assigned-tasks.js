@@ -1,9 +1,8 @@
-console.log("🔧 Technician Dashboard Loaded");
+console.log("📋 Assigned Tasks Page Loaded");
 
 const API_BASE = "http://localhost:5000/api";
 const token = localStorage.getItem("token");
 const user = JSON.parse(localStorage.getItem("user") || "{}");
-let allIssues = [];
 
 // Check authentication
 if (!token || !user.id) {
@@ -11,10 +10,12 @@ if (!token || !user.id) {
   window.location.href = "login.html";
 }
 
+let allIssues = [];
+
 // ==========================================
-// REAL-TIME DATA LOADING
+// LOAD ASSIGNED ISSUES
 // ==========================================
-async function loadDashboardData() {
+async function loadAssignedIssues() {
   try {
     const response = await fetch(`${API_BASE}/technician/issues/assigned`, {
       headers: { "Authorization": `Bearer ${token}` }
@@ -28,84 +29,99 @@ async function loadDashboardData() {
     const data = await response.json();
     allIssues = data.issues || [];
 
-    // Calculate statistics
-    const tasksAssigned = allIssues.length;
-    const tasksInProgress = allIssues.filter(i => i.status === 'in-progress').length;
-    const completedTasks = allIssues.filter(i => i.status === 'resolved' || i.status === 'closed').length;
-
-    // Update dashboard numbers
-    updateDashboard(tasksAssigned, tasksInProgress, completedTasks);
-    
-    // Display assigned issues
-    displayAssignedIssues();
+    console.log(`Loaded ${allIssues.length} assigned issues`);
+    displayIssues(allIssues);
 
   } catch (error) {
-    console.error("Error loading dashboard data:", error);
+    console.error("Error loading assigned issues:", error);
   }
 }
 
-function updateDashboard(assigned, inProgress, completed) {
-  // Update by element ID
-  const assignedEl = document.getElementById('tasksAssigned');
-  const inProgressEl = document.getElementById('tasksInProgress');
-  const completedEl = document.getElementById('tasksCompleted');
-  
-  if (assignedEl) assignedEl.textContent = assigned;
-  if (inProgressEl) inProgressEl.textContent = inProgress;
-  if (completedEl) completedEl.textContent = completed;
-
-  console.log(`✅ Dashboard updated: ${assigned} assigned, ${inProgress} in progress, ${completed} completed`);
-}
-
 // ==========================================
-// DISPLAY ASSIGNED ISSUES
+// DISPLAY ISSUES
 // ==========================================
-function displayAssignedIssues() {
-  const container = document.getElementById('assignedIssuesContainer');
-  if (!container) return;
+function displayIssues(issues) {
+  const container = document.getElementById("tasksContainer");
 
-  if (allIssues.length === 0) {
-    container.innerHTML = '<p class="text-gray-500 text-center py-12 col-span-full">No assigned issues at the moment</p>';
+  if (issues.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full p-10 bg-white/70 rounded-xl text-center">
+        <p class="text-gray-600 text-lg">✨ No assigned tasks yet!</p>
+        <p class="text-gray-500 text-sm mt-2">You will receive notifications when new issues are assigned.</p>
+      </div>
+    `;
     return;
   }
 
-  container.innerHTML = allIssues.map(issue => {
+  container.innerHTML = issues.map(issue => {
     const statusColors = {
-      'open': 'bg-yellow-100 text-yellow-800',
-      'assigned': 'bg-blue-100 text-blue-800',
-      'in-progress': 'bg-purple-100 text-purple-800',
-      'resolved': 'bg-green-100 text-green-800',
-      'closed': 'bg-gray-100 text-gray-800'
-    };
-    
-    const priorityColors = {
-      'Critical': 'bg-red-50 text-red-700 border-l-4 border-red-500',
-      'Urgent': 'bg-orange-50 text-orange-700 border-l-4 border-orange-500',
-      'Routine': 'bg-yellow-50 text-yellow-700 border-l-4 border-yellow-500',
-      'Risky': 'bg-purple-50 text-purple-700 border-l-4 border-purple-500'
+      'assigned': 'blue',
+      'in-progress': 'purple',
+      'resolved': 'green',
+      'closed': 'gray'
     };
 
-    const statusClass = statusColors[issue.status] || 'bg-gray-100 text-gray-800';
-    const priorityClass = priorityColors[issue.priority] || 'bg-gray-50 text-gray-700 border-l-4 border-gray-500';
-    const date = new Date(issue.createdAt).toLocaleDateString();
-    
+    const statusColor = statusColors[issue.status] || 'blue';
+    const borderColor = {
+      'blue': 'border-blue-300',
+      'purple': 'border-purple-300',
+      'green': 'border-green-300',
+      'gray': 'border-gray-300'
+    }[statusColor];
+
+    const bgColor = {
+      'blue': 'bg-blue-50',
+      'purple': 'bg-purple-50',
+      'green': 'bg-green-50',
+      'gray': 'bg-gray-50'
+    }[statusColor];
+
+    const textColor = {
+      'blue': 'text-blue-700',
+      'purple': 'text-purple-700',
+      'green': 'text-green-700',
+      'gray': 'text-gray-700'
+    }[statusColor];
+
+    const createdDate = new Date(issue.createdAt).toLocaleDateString('en-IN');
+
     return `
-      <div class="p-6 rounded-xl shadow-lg ${priorityClass} hover:shadow-xl transition cursor-pointer">
-        <div class="flex justify-between items-start mb-3">
-          <h4 class="font-bold text-lg">${issue.title}</h4>
-          <span class="px-3 py-1 rounded-full text-xs font-bold ${statusClass} capitalize">${issue.status}</span>
+      <div class="task-card bg-white rounded-xl shadow-lg p-6 border-l-4 ${borderColor} hover:shadow-xl">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h3 class="font-bold text-lg text-gray-800">${escapeHtml(issue.title)}</h3>
+            <p class="text-gray-600 text-sm mt-1">📍 ${escapeHtml(issue.location)}</p>
+          </div>
+          <span class="px-3 py-1 text-sm font-medium rounded-full ${bgColor} ${textColor}">
+            ${issue.status.charAt(0).toUpperCase() + issue.status.slice(1)}
+          </span>
         </div>
-        
-        <p class="text-sm mb-3 opacity-90">📍 ${issue.location}</p>
-        
-        <div class="flex gap-2 mb-4">
-          <span class="px-2 py-1 bg-white/50 rounded text-xs font-medium">🏷️ ${issue.category}</span>
-          <span class="px-2 py-1 bg-white/50 rounded text-xs font-medium">⚡ ${issue.priority}</span>
+
+        <!-- Description -->
+        <p class="text-gray-700 text-sm mb-4">${escapeHtml(issue.description.substring(0, 100))}${issue.description.length > 100 ? '...' : ''}</p>
+
+        <!-- Category & Priority -->
+        <div class="flex gap-3 mb-4">
+          <span class="px-2 py-1 bg-teal-50 text-teal-700 text-xs rounded-lg font-medium">
+            🏷️ ${escapeHtml(issue.category)}
+          </span>
+          <span class="px-2 py-1 ${
+            issue.priority === 'Critical' ? 'bg-red-50 text-red-700' :
+            issue.priority === 'Urgent' ? 'bg-orange-50 text-orange-700' :
+            issue.priority === 'Routine' ? 'bg-yellow-50 text-yellow-700' :
+            'bg-blue-50 text-blue-700'
+          } text-xs rounded-lg font-medium">
+            ⚡ ${escapeHtml(issue.priority)}
+          </span>
         </div>
-        
-        <p class="text-xs opacity-75 mb-4">📅 ${date}</p>
-        
-        <button onclick="viewIssueDetails('${issue._id}')" class="w-full py-2 bg-white/20 hover:bg-white/30 rounded-lg transition font-medium text-sm">
+
+        <!-- Date -->
+        <p class="text-gray-500 text-xs mb-4">📅 ${createdDate}</p>
+
+        <!-- Action Button -->
+        <button onclick="viewIssueDetails('${issue._id}')" class="w-full py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:opacity-90 transition font-medium">
           View Details →
         </button>
       </div>
@@ -114,10 +130,36 @@ function displayAssignedIssues() {
 }
 
 // ==========================================
+// FILTER & SEARCH
+// ==========================================
+function setupFilters() {
+  const searchInput = document.getElementById("searchInput");
+  const statusFilter = document.getElementById("statusFilter");
+
+  searchInput.addEventListener("input", filterIssues);
+  statusFilter.addEventListener("change", filterIssues);
+}
+
+function filterIssues() {
+  const searchValue = document.getElementById("searchInput").value.toLowerCase();
+  const statusValue = document.getElementById("statusFilter").value;
+
+  const filtered = allIssues.filter(issue => {
+    const matchesSearch = issue.title.toLowerCase().includes(searchValue) ||
+                         issue.description.toLowerCase().includes(searchValue);
+    const matchesStatus = !statusValue || issue.status === statusValue;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  displayIssues(filtered);
+}
+
+// ==========================================
 // VIEW ISSUE DETAILS (MODAL)
 // ==========================================
 function viewIssueDetails(issueId) {
-  const issue = allIssues.find(i => i._id === issueId);
+  const issue = issues.find(i => i._id === issueId);
   if (!issue) return;
 
   const modal = document.getElementById('issueModal');
@@ -126,9 +168,9 @@ function viewIssueDetails(issueId) {
   document.getElementById('modalTitle').textContent = issue.title;
   document.getElementById('modalCategory').textContent = issue.category || '-';
   document.getElementById('modalPriority').textContent = issue.priority || '-';
-  document.getElementById('modalLocation').textContent = issue.location || '-';
   document.getElementById('modalDescription').textContent = issue.description || '-';
   document.getElementById('modalCreated').textContent = new Date(issue.createdAt).toLocaleDateString();
+  document.getElementById('modalUpdated').textContent = new Date(issue.updatedAt).toLocaleDateString();
   
   // Status badge
   const statusColors = {
@@ -201,21 +243,20 @@ function viewIssueDetails(issueId) {
 // ==========================================
 function setupNavigation() {
   const navLinks = document.querySelectorAll('aside nav a');
-  
+
   navLinks.forEach(link => {
     link.style.cursor = 'pointer';
-    
+
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const text = link.textContent.trim();
-      
+
       switch(text) {
         case 'Dashboard':
-          // Already on dashboard, reload data
-          loadDashboardData();
+          window.location.href = 'Technician.html';
           break;
         case 'Assigned Tasks':
-          window.location.href = 'assigned-tasks.html';
+          // Already on this page
           break;
         case 'Live Issues':
           window.location.href = 'live_issues.html';
@@ -239,11 +280,24 @@ function logout() {
 }
 
 // ==========================================
+// HELPER FUNCTIONS
+// ==========================================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ==========================================
 // INITIALIZATION
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🔧 Initializing Technician Dashboard...");
-  
+  console.log("📋 Initializing Assigned Tasks Page...");
+
+  loadAssignedIssues();
+  setupFilters();
+  setupNavigation();
+
   // Modal close button handler
   const closeBtn = document.getElementById('closeModalBtn');
   const issueModal = document.getElementById('issueModal');
@@ -265,17 +319,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-  
-  // Load data every 5 seconds for real-time updates
-  loadDashboardData();
-  setInterval(loadDashboardData, 5000);
-  
-  // Setup navigation
-  setupNavigation();
-  
-  // Display technician name
-  const header = document.querySelector('h2');
-  if (header && user.name) {
-    header.textContent = `Welcome, ${user.name} 👨‍🔧`;
-  }
+
+  // Reload every 5 seconds for real-time updates
+  setInterval(loadAssignedIssues, 5000);
 });

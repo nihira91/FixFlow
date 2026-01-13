@@ -1,15 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FixFlow IMS — Employee Dashboard</title>
-
-    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Tailwind Custom Theme -->
     <script>
         tailwind.config = {
             theme: {
@@ -17,133 +12,201 @@
                     colors: {
                         primary: '#00b7a8',
                         secondary: '#009fbe',
-                        glassWhite: 'rgba(255,255,255,0.65)',
                     }
                 }
             }
         }
     </script>
-
-    <!-- External JavaScript -->
+    <style>
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .stat-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 183, 168, 0.2);
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide {
+            animation: slideIn 0.5s ease forwards;
+        }
+    </style>
     <script defer src="Employee.js"></script>
 </head>
 
-<body class="bg-gray-100">
-
-    <div class="flex">
-
-        <!-- LEFT SIDEBAR -->
-        <aside class="w-64 min-h-screen bg-glassWhite backdrop-blur-xl 
-                     shadow-xl p-6 border-r border-white/20">
-
+<body>
+    <div class="flex min-h-screen">
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-white shadow-lg p-6 overflow-y-auto border-r-2 border-primary/20">
             <!-- LOGO -->
-            <div class="flex items-center space-x-3 mb-8">
-                <div class="bg-gradient-to-r from-primary to-secondary p-3 rounded-xl text-white text-xl">
-                    🛠️
+            <div class="flex items-center gap-3 mb-10">
+                <div class="bg-gradient-to-r from-primary to-secondary p-3 rounded-xl text-white text-2xl">⚡</div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">FixFlow</h1>
+                    <p class="text-xs text-gray-500">IMS</p>
                 </div>
-                <h1 class="text-xl font-bold text-gray-800">FixFlow IMS</h1>
             </div>
 
             <!-- NAV MENU -->
-            <nav class="flex flex-col space-y-3 text-gray-700 font-medium">
-                <a class="p-2 rounded-lg bg-primary/20 text-primary">Dashboard</a>
-                <a href="report-issue.html" class="p-2 hover:bg-gray-200 rounded-lg cursor-pointer">
-    Report Issue
-</a>
-
-                <a href="my-issues.html" class="p-2 hover:bg-gray-200 rounded-lg">
-    My Issues
-</a>
-                <a href="profile.html" class="p-2 hover:bg-gray-200 rounded-lg">
-    Profile
-</a>
-                <a id="logoutBtn" class="p-2 hover:bg-gray-200 rounded-lg text-red-500 cursor-pointer">Logout</a>
+            <nav class="space-y-2 mb-8">
+                <a href="index.html" class="w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold flex items-center gap-3 transition">
+                    <span>🏠</span> Home
+                </a>
+                <button class="w-full text-left px-4 py-3 rounded-lg bg-primary/20 text-primary font-bold flex items-center gap-3 transition">
+                    <span>📊</span> Dashboard
+                </button>
+                <a href="report-issue.html" class="w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold flex items-center gap-3 transition">
+                    <span>📝</span> Report Issue
+                </a>
+                <a href="my-issues.html" class="w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold flex items-center gap-3 transition">
+                    <span>🎯</span> My Issues
+                </a>
+                <a href="Community_page.html" class="w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold flex items-center gap-3 transition">
+                    <span>💬</span> Community
+                </a>
+                <a href="profile.html" class="w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 font-semibold flex items-center gap-3 transition">
+                    <span>👤</span> Profile
+                </a>
             </nav>
+
+            <!-- LOGOUT -->
+            <button id="logoutBtn" class="w-full px-4 py-3 rounded-lg font-bold text-white bg-red-500 hover:bg-red-600 transition flex items-center gap-3">
+                <span>🚪</span> Logout
+            </button>
         </aside>
 
         <!-- MAIN CONTENT -->
-        <main class="flex-1 p-10">
+        <main class="flex-1 p-8 overflow-y-auto">
+            <!-- HEADER -->
+            <div class="mb-10 animate-slide">
+                <h2 class="text-4xl font-bold text-gray-900 mb-2">Welcome, <span id="welcomeName">Employee</span> 👋</h2>
+                <p class="text-gray-600 text-lg">Monitor your issues and stay updated in real-time</p>
+            </div>
 
-            <!-- HEADER SECTION -->
-            <div class="bg-gradient-to-r from-primary to-secondary text-white 
-                        p-6 rounded-xl shadow-lg mb-8 flex justify-between items-center">
-
-                <div>
-                    <h2 class="text-3xl font-bold">Welcome, <span id="welcomeName">Employee</span> 👋</h2>
-                    <p class="text-sm opacity-80">Your centralized employee dashboard</p>
+            <!-- REAL-TIME STATS CARDS -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10" style="animation-delay: 0.1s;">
+                <div class="stat-card glass p-6 rounded-2xl border border-gray-200">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-600 text-sm font-semibold mb-2">Open Issues</p>
+                            <h3 class="text-4xl font-bold text-primary" id="openIssuesCount">0</h3>
+                        </div>
+                        <span class="text-4xl">📋</span>
+                    </div>
                 </div>
 
-                <div class="px-4 py-2 bg-white/40 rounded-xl text-gray-900 font-semibold">
-                    EMPLOYEE PORTAL
+                <div class="stat-card glass p-6 rounded-2xl border border-gray-200">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-600 text-sm font-semibold mb-2">In Progress</p>
+                            <h3 class="text-4xl font-bold text-secondary" id="inProgressCount">0</h3>
+                        </div>
+                        <span class="text-4xl">⚙️</span>
+                    </div>
+                </div>
+
+                <div class="stat-card glass p-6 rounded-2xl border border-gray-200">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-600 text-sm font-semibold mb-2">Resolved</p>
+                            <h3 class="text-4xl font-bold text-green-600" id="resolvedCount">0</h3>
+                        </div>
+                        <span class="text-4xl">✅</span>
+                    </div>
+                </div>
+
+                <div class="stat-card glass p-6 rounded-2xl border border-gray-200">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-600 text-sm font-semibold mb-2">Total Issues</p>
+                            <h3 class="text-4xl font-bold text-orange-600" id="totalIssuesCount">0</h3>
+                        </div>
+                        <span class="text-4xl">📊</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- EMPLOYEE INFO CARD -->
-            <div class="bg-white/70 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-gray-200 mb-10">
-
-                <h3 class="text-xl font-semibold text-gray-800 flex items-center">
-                    👤 Employee Information
+            <!-- RECENT ACTIVITY WITH TECHNICIAN DETAILS -->
+            <div class="glass p-8 rounded-2xl border border-gray-200" style="animation-delay: 0.2s;">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                    <span>📌</span> Recent Issues & Technician Details
                 </h3>
-
-                <p class="text-gray-600 mt-2">
-                    Below are your registered account details.
-                </p>
-
-                <div class="mt-4 space-y-2 text-gray-800">
-                    <p><strong>Name:</strong> <span id="empName">Loading...</span></p>
-                    <p><strong>Email:</strong> <span id="empEmail">Loading...</span></p>
-                    <p><strong>Role:</strong> <span id="empRole">Loading...</span></p>
+                <div id="recentActivityContainer" class="space-y-4">
+                    <p class="text-gray-500 text-center py-12">Loading real-time data...</p>
                 </div>
             </div>
 
-            <!-- STATS SECTION -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-
-                <div class="p-6 bg-white/70 backdrop-blur-lg rounded-xl shadow-lg text-center">
-                    <h3 class="text-gray-700 text-lg font-semibold">Total Issues</h3>
-                    <p id="totalIssues" class="text-3xl font-bold text-primary mt-2">0</p>
-
-                </div>
-
-                <div class="p-6 bg-white/70 backdrop-blur-lg rounded-xl shadow-lg text-center">
-                    <h3 class="text-gray-700 text-lg font-semibold">In Progress</h3>
-                    <p id="inProgressIssues" class="text-3xl font-bold text-secondary mt-2">0</p>
-                </div>
-
-                <div class="p-6 bg-white/70 backdrop-blur-lg rounded-xl shadow-lg text-center">
-                    <h3 class="text-gray-700 text-lg font-semibold">Resolved Issues</h3>
-                    <p id="resolvedIssues" class="text-3xl font-bold text-green-600 mt-2">0</p>
+            <!-- ISSUE DETAIL MODAL -->
+            <div id="issueModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto">
+                    <!-- Close Button -->
+                    <button id="closeModalBtn" class="float-right text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+                    
+                    <!-- Issue Title -->
+                    <h2 id="modalTitle" class="text-3xl font-bold text-gray-900 mb-4 pr-8">Issue Title</h2>
+                    
+                    <!-- Status Badge -->
+                    <div class="mb-6">
+                        <span id="modalStatus" class="px-4 py-2 rounded-full font-bold text-sm">Status</span>
+                    </div>
+                    
+                    <!-- Issue Details Section -->
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <p class="text-gray-600 text-sm font-semibold mb-1">Category</p>
+                            <p id="modalCategory" class="text-lg text-gray-900 font-bold">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600 text-sm font-semibold mb-1">Priority</p>
+                            <p id="modalPriority" class="text-lg text-gray-900 font-bold">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600 text-sm font-semibold mb-1">Created</p>
+                            <p id="modalCreated" class="text-lg text-gray-900 font-bold">-</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600 text-sm font-semibold mb-1">Last Updated</p>
+                            <p id="modalUpdated" class="text-lg text-gray-900 font-bold">-</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="mb-8">
+                        <p class="text-gray-600 text-sm font-semibold mb-2">Description</p>
+                        <p id="modalDescription" class="text-gray-700 leading-relaxed">-</p>
+                    </div>
+                    
+                    <!-- Technician Details Section -->
+                    <div class="border-t-2 border-gray-200 pt-6 mb-8">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">👨‍💼 Assigned Technician</h3>
+                        <div id="technicianSection" class="bg-gradient-to-r from-primary/10 to-secondary/10 p-6 rounded-2xl border-2 border-primary/20">
+                            <p id="technicianStatus" class="text-center text-gray-600 py-4">No technician assigned yet</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Timeline -->
+                    <div class="border-t-2 border-gray-200 pt-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">📈 Progress Timeline</h3>
+                        <div id="timelineContainer" class="space-y-4">
+                            <p class="text-gray-500 text-center py-4">No progress updates yet</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- RECENT ISSUES TABLE -->
-            <div class="bg-white/70 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-gray-200">
-
-                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Recent Issues</h2>
-
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="text-gray-600 border-b">
-                            <th class="pb-2">Issue ID</th>
-                            <th class="pb-2">Title</th>
-                            <th class="pb-2">Status</th>
-                            <th class="pb-2">Updated</th>
-                            <th class="pb-2">View</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="recentIssuesTable" class="text-gray-700"></tbody>
-
-                </table>
-            </div>
-
-            <footer class="text-center text-gray-600 mt-8">
-                FixFlow IMS © 2025 — Authorized Personnel Only
+            <footer class="text-center text-gray-600 mt-8 text-sm">
+                FixFlow IMS © 2025 — Auto-refresh every 5 seconds
             </footer>
-
         </main>
     </div>
-
 </body>
-
 </html>

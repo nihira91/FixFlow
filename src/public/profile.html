@@ -47,9 +47,19 @@
 
   <main class="relative max-w-6xl mx-auto p-8 z-10">
 
-    <h1 class="text-4xl font-bold text-primary mb-8">
-      My Profile & Reports
-    </h1>
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-4">
+        <a href="index.html" class="px-3 py-2 bg-white/80 text-primary rounded-lg hover:bg-white transition flex items-center gap-2 shadow">
+          🏠 Home
+        </a>
+        <button id="backBtn" class="px-3 py-2 bg-white/80 text-primary rounded-lg hover:bg-white transition flex items-center gap-2 shadow">
+          ← Back
+        </button>
+        <h1 class="text-4xl font-bold text-primary">
+          My Profile & Reports
+        </h1>
+      </div>
+    </div>
 
     <!-- 👤 PROFILE CARD -->
     <section
@@ -155,6 +165,18 @@
     </section>
 
   </main>
+
+  <script>
+    // Back to Dashboard functionality
+    document.getElementById("backBtn").addEventListener("click", () => {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (user.role === "technician") {
+        window.location.href = "Technician.html";
+      } else {
+        window.location.href = "Employee.html";
+      }
+    });
+  </script>
 
   <!-- JS (UNCHANGED) -->
   <script src="empv1.js"></script>
