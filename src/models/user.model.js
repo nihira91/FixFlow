@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema(
   {
@@ -6,6 +7,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true
+    },
+
+    contactNo: {
+      type: String,
+      default: null
     },
 
     email: {
@@ -34,9 +40,62 @@ const userSchema = new mongoose.Schema(
     floor: {
       type: String,
       default: null
+    },
+
+    // Technician specific fields
+    category: {
+      type: String,
+      default: null  // e.g., 'Electrical', 'Plumbing', 'HVAC', 'Network'
+    },
+
+    skills: {
+      type: [String],
+      default: []
+    },
+
+    isAvailable: {
+      type: Boolean,
+      default: true
+    },
+
+    currentWorkload: {
+      type: Number,
+      default: 0  // Count of assigned issues
+    },
+
+    maxCapacity: {
+      type: Number,
+      default: 10  // Max issues a technician can handle
+    },
+
+    rating: {
+      type: Number,
+      default: 0
+    },
+
+    totalReviews: {
+      type: Number,
+      default: 0
+    },
+
+    profileCompleted: {
+      type: Boolean,
+      default: false  // For technicians - track if they completed profile setup
     }
   },
   {timestamps: true }
 );
+
+// Hash password before saving
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+// Compare password method
+userSchema.methods.comparePassword = async function (enteredPass) {
+  return await bcrypt.compare(enteredPass, this.password);
+};
 
 module.exports = mongoose.model('User', userSchema);

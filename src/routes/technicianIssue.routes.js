@@ -1,58 +1,45 @@
 const express = require("express");
 const router = express.Router();
 
-const { verifyToken, checkRole } = require("../middlewares/roleCheck");
+const { verifyToken, technicianAuthCheck } = require("../middlewares/technicianAuthCheck");
 
 const {
     getAssignedIssues,
-    getSingleIssue,
+    getTechnicianIssueDetails,
     updateIssueStatus,
-    uploadWorkProof
-
+    uploadProof
 } = require("../controllers/technicianIssue.controller");
 
 //get all issues assigned to the technician
-
 router.get(
-    "/issues/assigned",
+    "/assigned",
     verifyToken,
-    checkRole("technician"),
+    technicianAuthCheck("technician"),
     getAssignedIssues
 );
 
 //get single issue details
 router.get(
-    "/issue/:id",
+    "/:id",
     verifyToken,
-    checkRole("technician"),
-    getSingleIssue
+    technicianAuthCheck("technician"),
+    getTechnicianIssueDetails
 );
 
-//Patch-update issue status
+//update issue status
 router.patch(
-    "/issue/:id/status",
+    "/:id/status",
     verifyToken,
-    checkRole("technician"),
+    technicianAuthCheck("technician"),
     updateIssueStatus
 );
 
-//Patch- upload work proof
+//upload work proof
 router.patch(
-    "/issue/:id/upload-proof",
+    "/:id/upload-proof",
     verifyToken,
     technicianAuthCheck("technician"),
-    uploadWorkProof
-);
-
-const technicianAuthCheck = require("../middleware/technicianAuthCheck");
-router.get(
-    "/assigned",
-    technicianAuthCheck,
-    getAssignedIssues
+    uploadProof
 );
 
 module.exports = router;
-module.exports = {
-    verifyToken,
-    technicianAuthCheck
-};

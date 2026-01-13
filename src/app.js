@@ -119,21 +119,47 @@ try {
   console.log("❌ technicianAuth.routes.js missing:", err.message);
 }
 
-// try {
-//   const technicianIssueRoutes = require("./routes/technicianIssue.routes");
-//   app.use("/api/technician/issues", technicianIssueRoutes);
-//   console.log("✔ technicianIssue.routes.js");
-// } catch (err) {
-//   console.log("❌ technicianIssue.routes.js missing:", err.message);
-// }
+try {
+  const technicianIssueRoutes = require("./routes/technicianIssue.routes");
+  app.use("/api/technician/issues", technicianIssueRoutes);
+  console.log("✔ technicianIssue.routes.js");
+} catch (err) {
+  console.log("❌ technicianIssue.routes.js missing:", err.message);
+}
 
-// try {
-//   const technicianCommentRoutes = require("./routes/technicianComment.routes");
-//   app.use("/api/technician/comments", technicianCommentRoutes);
-//   console.log("✔ technicianComment.routes.js");
-// } catch (err) {
-//   console.log("❌ technicianComment.routes.js missing:", err.message);
-// }
+try {
+  const technicianCommentRoutes = require("./routes/technicianComment.routes");
+  app.use("/api/technician/comments", technicianCommentRoutes);
+  console.log("✔ technicianComment.routes.js");
+} catch (err) {
+  console.log("❌ technicianComment.routes.js missing:", err.message);
+}
+
+/* =======================
+   AVAILABLE TECHNICIAN ROUTES
+======================= */
+console.log("🟡 Registering Available Technician Routes");
+
+try {
+  const availableTechnicianRoutes = require("./routes/availableTechnician.routes");
+  app.use("/api/technicians", availableTechnicianRoutes);
+  console.log("✔ availableTechnician.routes.js");
+} catch (err) {
+  console.log("❌ availableTechnician.routes.js missing:", err.message);
+}
+
+/* =======================
+   Community Routes
+======================= */
+console.log("🟡 Registering Community Routes");
+
+try {
+  const communityRoutes = require("./routes/community.routes");
+  app.use("/api/community", communityRoutes);
+  console.log("✔ community.routes.js");
+} catch (err) {
+  console.log("❌ community.routes.js missing:", err.message);
+}
 
 /* =======================
    HEALTH CHECKS

@@ -3,16 +3,14 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 /* ============================
-   TECHNICIAN SIGNUP
+   TECHNICIAN SIGNUP (Basic Info Only)
 ============================ */
-
-
 exports.signupTechnician = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, contactNo } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (!name || !email || !password || !contactNo) {
+      return res.status(400).json({ message: "Name, email, contact no., and password are required" });
     }
 
     const existingUser = await User.findOne({ email });
@@ -23,23 +21,68 @@ exports.signupTechnician = async (req, res) => {
     const technician = await User.create({
       name,
       email,
-      password, // hashed by model
-      role: "technician"
+      password, // hashed by model pre-save hook
+      contactNo,
+      role: "technician",
+      profileCompleted: false  // Flag to indicate incomplete profile
     });
 
+    // Generate token for redirect to profile completion
+    const token = jwt.sign(
+      { id: technician._id, role: technician.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
     return res.status(201).json({
-      message: "Technician registered successfully",
+      message: "Technician registered successfully. Please complete your profile.",
+      token,
       user: {
         id: technician._id,
         name: technician.name,
         email: technician.email,
-        role: technician.role
+        role: technician.role,
+        profileCompleted: technician.profileCompleted
       }
     });
 
   } catch (error) {
     console.error("Technician signup error:", error);
     return res.status(500).json({ message: "Server error during signup" });
+  }
+};
+
+/* ============================
+   TECHNICIAN PROFILE COMPLETION
+============================ */
+exports.completeProfile = async (req, res) => {
+  try {
+    const { category, maxCapacity } = req.body;
+    const technicianId = req.user.id;
+
+    if (!category) {
+      return res.status(400).json({ message: "Category is required" });
+    }
+
+    const technician = await User.findByIdAndUpdate(
+      technicianId,
+      {
+        category,
+        maxCapacity: maxCapacity || 10,
+        profileCompleted: true,
+        isAvailable: true
+      },
+      { new: true }
+    ).select("-password");
+
+    return res.status(200).json({
+      message: "Profile completed successfully",
+      user: technician
+    });
+
+  } catch (error) {
+    console.error("Profile completion error:", error);
+    return res.status(500).json({ message: "Server error during profile completion" });
   }
 };
 
@@ -73,7 +116,9 @@ exports.loginTechnician = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        category: user.category,
+        profileCompleted: user.profileCompleted
       }
     });
 
@@ -84,7 +129,7 @@ exports.loginTechnician = async (req, res) => {
 };
 
 /* ============================
-   TECHNICIAN PROFILE
+   TECHNICIAN PROFILE (GET)
 ============================ */
 exports.getTechnicianProfile = async (req, res) => {
   try {

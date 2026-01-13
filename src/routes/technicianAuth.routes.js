@@ -4,7 +4,8 @@ const router = express.Router();
 const {
   signupTechnician,
   loginTechnician,
-  getTechnicianProfile
+  getTechnicianProfile,
+  completeProfile
 } = require("../controllers/technicianAuth.controller");
 
 const {
@@ -13,9 +14,19 @@ const {
 } = require("../middlewares/technicianAuthCheck");
 
 // ===============================
-// Technician Signup
+// Technician Signup (Basic Info Only)
 // ===============================
 router.post("/signup", signupTechnician);
+
+// ===============================
+// Technician Profile Completion
+// ===============================
+router.post(
+  "/complete-profile",
+  verifyToken,
+  technicianAuthCheck("technician"),
+  completeProfile
+);
 
 // ===============================
 // Technician Login
@@ -23,7 +34,7 @@ router.post("/signup", signupTechnician);
 router.post("/login", loginTechnician);
 
 // ===============================
-// Technician Profile
+// Technician Profile (Get)
 // ===============================
 router.get(
   "/profile",

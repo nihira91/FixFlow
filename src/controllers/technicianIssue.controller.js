@@ -1,15 +1,15 @@
 const Issue = require('../models/issue.model');
 const User = require('../models/user.model');
 
-exports.getAssignedIssues = async (requestAnimationFrame, res) => {
+exports.getAssignedIssues = async (req, res) => {
     try {
-        const technicianId = requestAnimationFrame.user.id;
+        const technicianId = req.user.id;
         const issues = await Issue.find({
             assignedTechnician: technicianId
         })
             .sort({ createdAt: -1 })
             .populate('createdBy', 'name email floor deskId')
-            .populate('assignedTechhnician', 'name email department');
+            .populate('assignedTechnician', 'name email department');
 
         return res.status(200).json({ issues });
 
@@ -20,7 +20,7 @@ exports.getAssignedIssues = async (requestAnimationFrame, res) => {
 };
 
 
-exports.getTechhnicianIssueDetails = async (req, res) => {
+exports.getTechnicianIssueDetails = async (req, res) => {
     try {
         const issue = await Issue.findById(req.params.id)
             .populate('createdBy', 'name email')

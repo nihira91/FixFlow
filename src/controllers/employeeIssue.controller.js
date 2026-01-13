@@ -3,6 +3,7 @@ const { getIO } = require("../socket");
 
 const Issue = require('../models/issue.model');
 const User = require('../models/user.model');
+const { assignTechnicianToIssue, unassignTechnicianFromIssue } = require('../services/issueAssignment.service');
 
 exports.createIssue = async (req, res) => {
   try {
@@ -29,12 +30,29 @@ exports.createIssue = async (req, res) => {
       ]
     });
 
+    // 🔥 AUTO-ASSIGN TECHNICIAN BASED ON CATEGORY & AVAILABILITY
+    const assignmentResult = await assignTechnicianToIssue(issue._id);
+    if (assignmentResult.success) {
+      console.log(`✅ Issue ${issue._id} assigned to ${assignmentResult.technician.name}`);
+      const io = require("../socket").getIO();
+      // Notify technician about new assignment
+      io.to(`technician_${assignmentResult.technician._id}`).emit("newIssueAssigned", {
+        issueId: issue._id,
+        title: issue.title,
+        category: issue.category,
+        priority: issue.priority
+      });
+    } else {
+      console.log(`⚠️ Could not auto-assign issue: ${assignmentResult.message}`);
+    }
+
     const io = require("../socket").getIO();
     io.to(`employee_${req.user.id}`).emit("issueCreated", issue);
 
     res.status(201).json({
-      message: "Issue created",
-      issue
+      message: "Issue created successfully",
+      issue,
+      assignment: assignmentResult
     });
 
   } catch (err) {
@@ -60,10 +78,10 @@ exports.getEmployeeIssues = async (req, res) => {
     if (category) filter.category = category;
 
     const issues = await Issue.find(filter)
-      .sort({ createdAt: -1 }) // ✅ FIXED
+      .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit))
-      .populate("assignedTechnician", "name email department");
+      .populate("assignedTechnician", "name email category currentWorkload");
 
     res.status(200).json({ issues });
   } catch (err) {
@@ -77,7 +95,7 @@ exports.getSingleIssue = async (req, res) => {
   try {
     const issue = await Issue.findById(req.params.id)
       .populate('createdBy', 'name email')
-      .populate('assignedTechnician', 'name email department');
+      .populate('assignedTechnician', 'name email category currentWorkload');
 
     if (!issue) return res.status(404).json({ message: 'Issue not found' });
     // Ensure employee only accesses own issue
@@ -113,6 +131,12 @@ exports.updateIssueStatus = async (req, res) => {
       timestamp: new Date()
     });
 
+    // If issue is resolved or closed, unassign technician
+    if (status === 'resolved' || status === 'closed') {
+      const unassignResult = await unassignTechnicianFromIssue(issueId);
+      console.log(`Unassignment result: ${unassignResult.message}`);
+    }
+
     await issue.save();
 
     // 🔥 REAL-TIME EMIT
@@ -129,6 +153,33 @@ exports.updateIssueStatus = async (req, res) => {
 
   } catch (err) {
     console.error("updateIssueStatus error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+/**
+ * Get all live issues (unresolved) in the system
+ * Used for the Live Issues page - shows all issues regardless of who created them
+ */
+exports.getAllLiveIssues = async (req, res) => {
+  try {
+    const { status = ['open', 'assigned', 'inprogress'], category, page = 1, limit = 20 } = req.query;
+
+    // Parse status - can be comma-separated string
+    const statusArray = typeof status === 'string' ? status.split(',') : status;
+
+    const filter = { status: { $in: statusArray } };
+    if (category) filter.category = category;
+
+    const issues = await Issue.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit))
+      .populate("createdBy", "name email")
+      .populate("assignedTechnician", "name email category");
+
+    res.status(200).json({ issues });
+  } catch (err) {
+    console.error("getAllLiveIssues error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

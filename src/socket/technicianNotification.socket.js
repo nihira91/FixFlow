@@ -1,6 +1,6 @@
 module.exports = (io) => {
     io.on("connection", (socket) => {
-        consolelog("Technician connected:", socket.id);
+        console.log("Technician connected:", socket.id);
 
         socket.on("joinTechnicianRoom", (technicianId) => {
             socket.join('technician_${technicianId}');
