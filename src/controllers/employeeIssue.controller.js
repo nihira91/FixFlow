@@ -4,6 +4,7 @@ const { getIO } = require("../socket");
 const Issue = require('../models/issue.model');
 const User = require('../models/user.model');
 const { assignTechnicianToIssue, unassignTechnicianFromIssue } = require('../services/issueAssignment.service');
+const { initializeSLA, recordFirstResponse, recordResolution, calculateRemainingTime } = require('../services/sla.service');
 
 exports.createIssue = async (req, res) => {
   try {
@@ -30,6 +31,9 @@ exports.createIssue = async (req, res) => {
       ]
     });
 
+    // ✅ INITIALIZE SLA TRACKING
+    await initializeSLA(issue._id, issue.priority);
+
     // 🔥 AUTO-ASSIGN TECHNICIAN BASED ON CATEGORY & AVAILABILITY
     const assignmentResult = await assignTechnicianToIssue(issue._id);
     if (assignmentResult.success) {
@@ -46,12 +50,16 @@ exports.createIssue = async (req, res) => {
       console.log(`⚠️ Could not auto-assign issue: ${assignmentResult.message}`);
     }
 
+    // 🔄 FETCH UPDATED ISSUE WITH SLA DATA
+    const updatedIssue = await Issue.findById(issue._id)
+      .populate('assignedTechnician', 'name email category currentWorkload');
+
     const io = require("../socket").getIO();
-    io.to(`employee_${req.user.id}`).emit("issueCreated", issue);
+    io.to(`employee_${req.user.id}`).emit("issueCreated", updatedIssue);
 
     res.status(201).json({
       message: "Issue created successfully",
-      issue,
+      issue: updatedIssue,
       assignment: assignmentResult
     });
 
@@ -122,6 +130,19 @@ exports.updateIssueStatus = async (req, res) => {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       return res.status(404).json({ message: "Issue not found" });
+    }
+
+    // ✅ RECORD FIRST RESPONSE when status changes from open to assigned/in-progress
+    if ((issue.status === 'open' || issue.status === 'assigned') && 
+        (status === 'in-progress' || status === 'assigned')) {
+      if (!issue.sla.firstResponseTime) {
+        await recordFirstResponse(issueId);
+      }
+    }
+
+    // ✅ RECORD RESOLUTION when issue is resolved/closed
+    if ((status === 'resolved' || status === 'closed') && !issue.sla.resolvedTime) {
+      await recordResolution(issueId);
     }
 
     // Update issue

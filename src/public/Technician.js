@@ -89,6 +89,30 @@ function displayAssignedIssues() {
     const priorityClass = priorityColors[issue.priority] || 'bg-gray-50 text-gray-700 border-l-4 border-gray-500';
     const date = new Date(issue.createdAt).toLocaleDateString();
     
+    // 🎯 SLA STATUS BADGE
+    const slaStatus = issue.sla?.responseStatus || 'pending';
+    const slaBreached = issue.sla?.responseTimeBreached || false;
+    const remainingTime = issue.sla?.responseTimeRemaining || 0;
+    
+    let slaColor = 'bg-gray-100 text-gray-700';
+    let slaText = '⏳ No SLA';
+    
+    if (slaBreached) {
+      slaColor = 'bg-red-100 text-red-700 border border-red-300 animate-pulse';
+      slaText = `🚨 SLA BREACHED`;
+    } else if (slaStatus === 'met') {
+      slaColor = 'bg-green-100 text-green-700 border border-green-300';
+      slaText = `✅ SLA MET`;
+    } else if (slaStatus === 'pending' && remainingTime > 0) {
+      if (remainingTime < (issue.sla?.responseTimeTarget || 60) * 0.25) {
+        slaColor = 'bg-yellow-100 text-yellow-700 border border-yellow-300';
+        slaText = `⚠️ AT RISK (${Math.round(remainingTime)}m)`;
+      } else {
+        slaColor = 'bg-blue-100 text-blue-700 border border-blue-300';
+        slaText = `⏱️ ${Math.round(remainingTime)}m left`;
+      }
+    }
+    
     return `
       <div class="p-6 rounded-xl shadow-lg ${priorityClass} hover:shadow-xl transition cursor-pointer">
         <div class="flex justify-between items-start mb-3">
@@ -101,6 +125,11 @@ function displayAssignedIssues() {
         <div class="flex gap-2 mb-4">
           <span class="px-2 py-1 bg-white/50 rounded text-xs font-medium">🏷️ ${issue.category}</span>
           <span class="px-2 py-1 bg-white/50 rounded text-xs font-medium">⚡ ${issue.priority}</span>
+        </div>
+        
+        <!-- 🎯 SLA Badge -->
+        <div class="mb-4 px-3 py-2 rounded-lg text-xs font-bold ${slaColor}">
+          ${slaText}
         </div>
         
         <p class="text-xs opacity-75 mb-4">📅 ${date}</p>
@@ -190,6 +219,11 @@ function viewIssueDetails(issueId) {
         </div>
       `;
     }).join('');
+  }
+  
+  // 🎯 LOAD SLA WIDGET
+  if (typeof slaWidget !== 'undefined') {
+    slaWidget.displaySLAWidget(issueId);
   }
   
   modal.classList.remove('hidden');

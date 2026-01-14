@@ -62,6 +62,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /* =======================
+   SERVE STATIC FILES
+======================= */
+app.use(express.static(__dirname + '/public'));
+console.log("✔ Static files serving from /public");
+
+/* =======================
    EMPLOYEE ROUTES
 ======================= */
 console.log("🟡 Registering Employee Routes");
@@ -159,6 +165,19 @@ try {
   console.log("✔ community.routes.js");
 } catch (err) {
   console.log("❌ community.routes.js missing:", err.message);
+}
+
+/* =======================
+   SLA TRACKING ROUTES
+======================= */
+console.log("🟡 Registering SLA Routes");
+
+try {
+  const slaRoutes = require("./routes/sla.routes");
+  app.use("/api/sla", slaRoutes);
+  console.log("✔ sla.routes.js");
+} catch (err) {
+  console.log("❌ sla.routes.js missing:", err.message);
 }
 
 /* =======================

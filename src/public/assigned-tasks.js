@@ -85,6 +85,30 @@ function displayIssues(issues) {
 
     const createdDate = new Date(issue.createdAt).toLocaleDateString('en-IN');
 
+    // 🎯 SLA STATUS BADGE
+    const slaStatus = issue.sla?.responseStatus || 'pending';
+    const slaBreached = issue.sla?.responseTimeBreached || false;
+    const remainingTime = issue.sla?.responseTimeRemaining || 0;
+    
+    let slaColor = 'bg-gray-100 text-gray-700';
+    let slaText = '⏳ No SLA';
+    
+    if (slaBreached) {
+      slaColor = 'bg-red-100 text-red-700 border border-red-300 animate-pulse';
+      slaText = `🚨 SLA BREACHED`;
+    } else if (slaStatus === 'met') {
+      slaColor = 'bg-green-100 text-green-700 border border-green-300';
+      slaText = `✅ SLA MET`;
+    } else if (slaStatus === 'pending' && remainingTime > 0) {
+      if (remainingTime < (issue.sla?.responseTimeTarget || 60) * 0.25) {
+        slaColor = 'bg-yellow-100 text-yellow-700 border border-yellow-300';
+        slaText = `⚠️ AT RISK (${Math.round(remainingTime)}m)`;
+      } else {
+        slaColor = 'bg-blue-100 text-blue-700 border border-blue-300';
+        slaText = `⏱️ ${Math.round(remainingTime)}m left`;
+      }
+    }
+
     return `
       <div class="task-card bg-white rounded-xl shadow-lg p-6 border-l-4 ${borderColor} hover:shadow-xl">
         
@@ -115,6 +139,11 @@ function displayIssues(issues) {
           } text-xs rounded-lg font-medium">
             ⚡ ${escapeHtml(issue.priority)}
           </span>
+        </div>
+
+        <!-- 🎯 SLA Badge -->
+        <div class="mb-4 px-3 py-2 rounded-lg text-xs font-bold ${slaColor}">
+          ${slaText}
         </div>
 
         <!-- Date -->
@@ -232,6 +261,11 @@ function viewIssueDetails(issueId) {
         </div>
       `;
     }).join('');
+  }
+  
+  // 🎯 LOAD SLA WIDGET
+  if (typeof slaWidget !== 'undefined') {
+    slaWidget.displaySLAWidget(issueId);
   }
   
   modal.classList.remove('hidden');

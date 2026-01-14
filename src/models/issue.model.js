@@ -156,7 +156,57 @@ const issueSchema = new mongoose.Schema(
           default: null
         }
       }
-    ]
+    ],
+
+    /** ✅ SLA TRACKING FIELDS */
+    sla: {
+      responseTimeTarget: {
+        type: Number, // in minutes
+        default: null
+      },
+      resolutionTimeTarget: {
+        type: Number, // in minutes
+        default: null
+      },
+      firstResponseTime: {
+        type: Date, // when issue was first assigned/acknowledged
+        default: null
+      },
+      resolvedTime: {
+        type: Date, // when issue was resolved
+        default: null
+      },
+      responseStatus: {
+        type: String,
+        enum: ['pending', 'met', 'breached'],
+        default: 'pending'
+      },
+      resolutionStatus: {
+        type: String,
+        enum: ['pending', 'met', 'breached'],
+        default: 'pending'
+      },
+      responseTimeBreached: {
+        type: Boolean,
+        default: false
+      },
+      resolutionTimeBreached: {
+        type: Boolean,
+        default: false
+      },
+      responseTimeRemaining: {
+        type: Number, // in minutes (calculated)
+        default: null
+      },
+      resolutionTimeRemaining: {
+        type: Number, // in minutes (calculated)
+        default: null
+      },
+      breachAlertSent: {
+        type: Boolean,
+        default: false
+      }
+    }
   },
   { timestamps: true }
 );

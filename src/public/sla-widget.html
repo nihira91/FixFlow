@@ -1,0 +1,55 @@
+<!-- SLA Widget Component -->
+<!-- Include this in any page that displays issues -->
+
+<!-- SLA Widget Container -->
+<div id="sla-widget" class="sla-widget" style="display: none;">
+  <!-- Response SLA -->
+  <div class="sla-item">
+    <div class="sla-header">
+      <span class="sla-label">Response SLA</span>
+      <span class="sla-status-badge" id="response-status">PENDING</span>
+    </div>
+    <div class="sla-target">
+      <small>Target: <span id="response-target">--</span> min</small>
+    </div>
+    <div class="sla-progress-container">
+      <div class="sla-progress-bar" id="response-progress">
+        <div class="sla-progress-fill" id="response-fill"></div>
+      </div>
+      <span class="sla-remaining" id="response-remaining">-- min remaining</span>
+    </div>
+  </div>
+
+  <!-- Resolution SLA -->
+  <div class="sla-item">
+    <div class="sla-header">
+      <span class="sla-label">Resolution SLA</span>
+      <span class="sla-status-badge" id="resolution-status">PENDING</span>
+    </div>
+    <div class="sla-target">
+      <small>Target: <span id="resolution-target">--</span> min</small>
+    </div>
+    <div class="sla-progress-container">
+      <div class="sla-progress-bar" id="resolution-progress">
+        <div class="sla-progress-fill" id="resolution-fill"></div>
+      </div>
+      <span class="sla-remaining" id="resolution-remaining">-- min remaining</span>
+    </div>
+  </div>
+
+  <!-- SLA Info -->
+  <div class="sla-info">
+    <div class="sla-info-item">
+      <span class="info-label">Created:</span>
+      <span class="info-value" id="created-time">--</span>
+    </div>
+    <div class="sla-info-item">
+      <span class="info-label">First Response:</span>
+      <span class="info-value" id="first-response-time">Not yet</span>
+    </div>
+    <div class="sla-info-item">
+      <span class="info-label">Resolved:</span>
+      <span class="info-value" id="resolved-time">Not yet</span>
+    </div>
+  </div>
+</div>

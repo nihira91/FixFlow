@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SLA Data Verification</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">🔍 SLA Data Verification Tool</h1>
+
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <h2 class="text-xl font-bold mb-4">Check SLA Data on Issues</h2>
+      
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-2">Issue ID:</label>
+        <input id="issueId" type="text" placeholder="Enter issue ID" 
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <button onclick="checkIssue()" class="w-full bg-blue-500 text-white font-bold py-2 rounded-lg hover:bg-blue-600">
+        Check SLA Data
+      </button>
+    </div>
+
+    <div id="result" class="hidden bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-bold mb-4">Issue Details</h2>
+      <pre id="resultContent" class="bg-gray-50 p-4 rounded text-sm overflow-auto max-h-96"></pre>
+    </div>
+
+    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mt-6">
+      <p class="text-sm text-yellow-700">
+        <strong>📝 To find issue IDs:</strong><br>
+        Open browser DevTools → Console → Look for issue objects in network responses<br>
+        Or check the MongoDB directly via mongosh
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:5000/api';
+    const token = localStorage.getItem('token');
+
+    async function checkIssue() {
+      const issueId = document.getElementById('issueId').value.trim();
+      
+      if (!issueId) {
+        alert('Please enter an issue ID');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/sla/issue/${issueId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          alert('Issue not found or error fetching data');
+          return;
+        }
+
+        const data = await response.json();
+        
+        document.getElementById('result').classList.remove('hidden');
+        document.getElementById('resultContent').textContent = JSON.stringify(data, null, 2);
+
+        // Also show summary
+        console.log('📊 SLA Summary:');
+        console.log('Title:', data.title);
+        console.log('Priority:', data.priority);
+        console.log('Status:', data.status);
+        console.log('Response SLA:', data.sla.responseStatus, '-', data.sla.responseTimeRemaining, 'min remaining');
+        console.log('Resolution SLA:', data.sla.resolutionStatus, '-', data.sla.resolutionTimeRemaining, 'min remaining');
+
+      } catch (error) {
+        alert('Error: ' + error.message);
+        console.error(error);
+      }
+    }
+
+    // Optional: Check all user's issues
+    async function checkAllIssues() {
+      try {
+        const response = await fetch(`${API_BASE}/technician/issues/assigned`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+        console.log('📋 All Assigned Issues:');
+        data.issues.forEach(issue => {
+          console.log(`\n${issue.title}:`);
+          console.log('  Priority:', issue.priority);
+          console.log('  Has SLA:', !!issue.sla);
+          if (issue.sla) {
+            console.log('  Response Status:', issue.sla.responseStatus);
+            console.log('  Response Remaining:', issue.sla.responseTimeRemaining, 'min');
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching issues:', error);
+      }
+    }
+
+    // Auto-run on page load
+    console.log('✅ Verification tool loaded');
+    console.log('Available functions:');
+    console.log('  - checkIssue() - Check specific issue via form');
+    console.log('  - checkAllIssues() - List all assigned issues with SLA data');
+    console.log('\nTo check all issues, open console and run: checkAllIssues()');
+  </script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SLA Migration Tool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pulse-animation {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <div class="max-w-md w-full mx-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-8">
+      <div class="text-center mb-8">
+        <div class="text-5xl mb-4">🔄</div>
+        <h1 class="text-3xl font-bold text-gray-800">SLA Migration</h1>
+        <p class="text-gray-600 mt-2">Initialize SLA data for existing issues</p>
+      </div>
+
+      <div id="content">
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded">
+          <p class="text-sm text-blue-700">
+            <strong>ℹ️ This tool will:</strong><br>
+            • Find all issues without SLA data<br>
+            • Initialize SLA targets based on priority<br>
+            • Set tracking fields<br>
+            <br>
+            <strong>No data will be lost.</strong>
+          </p>
+        </div>
+
+        <div id="stats" class="hidden mb-6 p-4 bg-gray-50 rounded-lg">
+          <p class="text-sm text-gray-600 mb-2">Migration Status</p>
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-700 font-medium">Issues Updated:</span>
+              <span id="count" class="font-bold text-green-600 text-lg">-</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-700 font-medium">Status:</span>
+              <span id="status" class="font-bold text-blue-600">Running...</span>
+            </div>
+          </div>
+        </div>
+
+        <button id="migrateBtn" onclick="startMigration()" 
+          class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 rounded-lg hover:opacity-90 transition mb-3 flex items-center justify-center gap-2">
+          <span>▶️</span>
+          <span>Start Migration</span>
+        </button>
+
+        <button id="resetBtn" onclick="reset()" class="hidden w-full bg-gray-300 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-400 transition">
+          Reset
+        </button>
+
+        <p class="text-xs text-gray-500 text-center mt-4">
+          Takes 1-5 seconds depending on issue count
+        </p>
+      </div>
+
+      <div id="result" class="hidden">
+        <div id="resultContent"></div>
+        <button onclick="reset()" class="w-full bg-blue-500 text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition mt-4">
+          Back
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:5000/api';
+
+    async function startMigration() {
+      try {
+        // Show progress
+        document.getElementById('migrateBtn').disabled = true;
+        document.getElementById('migrateBtn').classList.add('opacity-50', 'cursor-not-allowed');
+        document.getElementById('stats').classList.remove('hidden');
+        
+        const response = await fetch(`${API_BASE}/sla/migrate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const result = await response.json();
+
+        // Show results
+        showResult(result);
+
+      } catch (error) {
+        showResult({
+          success: false,
+          message: error.message,
+          count: 0
+        });
+      }
+    }
+
+    function showResult(result) {
+      document.getElementById('content').classList.add('hidden');
+      document.getElementById('result').classList.remove('hidden');
+
+      const resultContent = document.getElementById('resultContent');
+      const icon = result.success ? '✅' : '❌';
+      const status = result.success ? 'SUCCESS' : 'FAILED';
+      const color = result.success ? 'green' : 'red';
+
+      resultContent.innerHTML = `
+        <div class="text-center">
+          <div class="text-6xl mb-4">${icon}</div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-4">${status}</h2>
+          <div class="bg-${color}-50 border-l-4 border-${color}-500 p-4 rounded mb-4 text-left">
+            <p class="text-sm text-${color}-700">
+              <strong>${result.message}</strong><br>
+              <br>
+              ${result.success 
+                ? `✅ ${result.count} issues updated with SLA data`
+                : `Error: ${result.error || 'Unknown error'}`
+              }
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    function reset() {
+      document.getElementById('content').classList.remove('hidden');
+      document.getElementById('result').classList.add('hidden');
+      document.getElementById('stats').classList.add('hidden');
+      document.getElementById('migrateBtn').disabled = false;
+      document.getElementById('migrateBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+  </script>
+</body>
+</html>

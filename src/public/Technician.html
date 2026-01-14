@@ -138,8 +138,12 @@
         }
     </style>
 
+    <!-- SLA Widget Styles -->
+    <link rel="stylesheet" href="/sla-widget.css">
+
     <!-- External Verification Script -->
     <script defer src="Technician.js"></script>
+    <script defer src="/sla-widget.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -281,6 +285,9 @@
                 <p class="text-gray-600 text-sm font-semibold mb-2">Description</p>
                 <p id="modalDescription" class="text-gray-700 leading-relaxed">-</p>
             </div>
+            
+            <!-- SLA WIDGET -->
+            <div id="sla-widget" class="mb-8" style="display: none;"></div>
             
             <!-- Reporter Details Section -->
             <div class="border-t-2 border-gray-200 pt-6 mb-8">
