@@ -181,6 +181,32 @@ try {
 }
 
 /* =======================
+   PROGRESS UPDATE ROUTES
+======================= */
+console.log("🟡 Registering Progress Routes");
+
+try {
+  const progressRoutes = require("./routes/progress.routes");
+  app.use("/api/progress", progressRoutes);
+  console.log("✔ progress.routes.js");
+} catch (err) {
+  console.log("❌ progress.routes.js missing:", err.message);
+}
+
+/* =======================
+   ISSUE COMPLETION & RATING ROUTES
+======================= */
+console.log("🟡 Registering Completion Routes");
+
+try {
+  const completionRoutes = require("./routes/completion.routes");
+  app.use("/api/completion", completionRoutes);
+  console.log("✔ completion.routes.js");
+} catch (err) {
+  console.log("❌ completion.routes.js missing:", err.message);
+}
+
+/* =======================
    HEALTH CHECKS
 ======================= */
 app.get("/", (req, res) => {

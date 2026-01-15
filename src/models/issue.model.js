@@ -206,6 +206,72 @@ const issueSchema = new mongoose.Schema(
         type: Boolean,
         default: false
       }
+    },
+
+    /** ✅ PROGRESS UPDATES FROM TECHNICIAN */
+    progressUpdates: [
+      {
+        _id: {
+          type: mongoose.Schema.Types.ObjectId,
+          auto: true
+        },
+        technician: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          required: true
+        },
+        message: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        timestamp: {
+          type: Date,
+          default: Date.now
+        },
+        type: {
+          type: String,
+          enum: ['progress', 'note', 'status-change'],
+          default: 'progress'
+        }
+      }
+    ],
+
+    /** ✅ TECHNICIAN RATING FROM EMPLOYEE */
+    technicianRating: {
+      rating: {
+        type: Number,
+        min: 1,
+        max: 5,
+        default: null
+      },
+      review: {
+        type: String,
+        trim: true,
+        maxlength: 500,
+        default: null
+      },
+      ratedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
+      },
+      ratedAt: {
+        type: Date,
+        default: null
+      }
+    },
+
+    /** ✅ COMPLETION DETAILS */
+    completedAt: {
+      type: Date,
+      default: null
+    },
+    completionNotes: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+      default: null
     }
   },
   { timestamps: true }

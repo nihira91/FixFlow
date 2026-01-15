@@ -226,6 +226,18 @@ function viewIssueDetails(issueId) {
     slaWidget.displaySLAWidget(issueId);
   }
   
+  // 📊 LOAD PROGRESS WIDGET
+  document.getElementById('progressWidget').style.display = 'block';
+  setupProgressWidget('technician');
+  loadProgressUpdates(issueId);
+  
+  // ✅ SHOW COMPLETION SECTION FOR IN-PROGRESS ISSUES
+  if (issue.status === 'in-progress' || issue.status === 'assigned') {
+    document.getElementById('completionSection').style.display = 'block';
+  } else {
+    document.getElementById('completionSection').style.display = 'none';
+  }
+  
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 }

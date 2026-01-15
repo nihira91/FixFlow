@@ -57,6 +57,218 @@
 
   <script defer src="assigned-tasks.js"></script>
   <script defer src="/sla-widget.js"></script>
+  
+  <!-- Progress Widget Functions (Inline) -->
+  <script defer>
+      // Progress Widget Global Variables - Namespaced to avoid conflicts
+      window.currentIssueId = null;
+      window.isTechnician = false;
+      const API_BASE_PROGRESS = 'http://localhost:5000/api';
+
+      /**
+       * Load and display progress updates for an issue
+       */
+      async function loadProgressUpdates(issueId) {
+          try {
+              window.currentIssueId = issueId;
+              
+              const response = await fetch(`${API_BASE_PROGRESS}/progress/${issueId}`, {
+                  headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+              });
+
+              if (!response.ok) {
+                  console.error('Failed to load progress updates');
+                  return;
+              }
+
+              const data = await response.json();
+              displayProgressUpdates(data.progressUpdates || []);
+
+          } catch (error) {
+              console.error('Error loading progress updates:', error);
+          }
+      }
+
+      /**
+       * Display progress updates in the UI
+       */
+      function displayProgressUpdates(updates) {
+          const container = document.getElementById('progressUpdatesList');
+          
+          if (!updates || updates.length === 0) {
+              container.innerHTML = '<p class="text-gray-500 text-center py-4">No progress updates yet</p>';
+              return;
+          }
+
+          container.innerHTML = updates.map((update, idx) => {
+              const isLast = idx === updates.length - 1;
+              const date = new Date(update.timestamp);
+              const formattedDate = date.toLocaleString();
+              const technicianName = update.technician?.name || 'Unknown Technician';
+
+              return `
+                  <div class="flex gap-4 pb-4 ${!isLast ? 'border-b border-gray-200' : ''}">
+                      <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-teal-400 flex items-center justify-center text-white font-bold flex-shrink-0">
+                          ${technicianName.charAt(0).toUpperCase()}
+                      </div>
+                      <div class="flex-1">
+                          <div class="flex justify-between items-start mb-1">
+                              <p class="font-bold text-gray-900">${technicianName}</p>
+                              <span class="text-xs text-gray-500">${formattedDate}</span>
+                          </div>
+                          <p class="text-gray-700">${escapeHtml(update.message)}</p>
+                          ${window.isTechnician && update.technician?._id === localStorage.getItem('userId') ? `
+                              <button onclick="deleteProgressUpdate('${update._id}')" class="text-xs text-red-500 hover:text-red-700 mt-2 font-medium">
+                                  🗑️ Delete
+                              </button>
+                          ` : ''}
+                      </div>
+                  </div>
+              `;
+          }).join('');
+      }
+
+      /**
+       * Submit a new progress update
+       */
+      async function submitProgressUpdate() {
+          try {
+              const message = document.getElementById('progressMessage').value.trim();
+              
+              if (!message) {
+                  showProgressError('Please enter a message');
+                  return;
+              }
+
+              if (message.length > 500) {
+                  showProgressError('Message is too long (max 500 characters)');
+                  return;
+              }
+
+              const response = await fetch(`${API_BASE_PROGRESS}/progress/add`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${localStorage.getItem('token')}`
+                  },
+                  body: JSON.stringify({
+                      issueId: window.currentIssueId,
+                      message: message
+                  })
+              });
+
+              if (!response.ok) {
+                  const error = await response.json();
+                  showProgressError(error.message || 'Failed to post update');
+                  return;
+              }
+
+              document.getElementById('progressMessage').value = '';
+              document.getElementById('progressForm').classList.add('hidden');
+              document.getElementById('toggleProgressFormBtn').classList.remove('hidden');
+              clearProgressError();
+              
+              await loadProgressUpdates(window.currentIssueId);
+
+          } catch (error) {
+              console.error('Error submitting progress update:', error);
+              showProgressError('Error posting update. Please try again.');
+          }
+      }
+
+      /**
+       * Delete a progress update
+       */
+      async function deleteProgressUpdate(updateId) {
+          if (!confirm('Delete this update?')) return;
+
+          try {
+              const response = await fetch(`${API_BASE_PROGRESS}/progress/update/${updateId}/${window.currentIssueId}`, {
+                  method: 'DELETE',
+                  headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+              });
+
+              if (!response.ok) {
+                  alert('Failed to delete update');
+                  return;
+              }
+
+              await loadProgressUpdates(window.currentIssueId);
+
+          } catch (error) {
+              console.error('Error deleting update:', error);
+          }
+      }
+
+      /**
+       * Toggle progress form visibility
+       */
+      function toggleProgressForm() {
+          const form = document.getElementById('progressForm');
+          const btn = document.getElementById('toggleProgressFormBtn');
+          
+          if (form.classList.contains('hidden')) {
+              form.classList.remove('hidden');
+              btn.classList.add('hidden');
+              document.getElementById('progressMessage').focus();
+          } else {
+              cancelProgressUpdate();
+          }
+      }
+
+      /**
+       * Cancel progress update
+       */
+      function cancelProgressUpdate() {
+          document.getElementById('progressMessage').value = '';
+          document.getElementById('progressForm').classList.add('hidden');
+          document.getElementById('toggleProgressFormBtn').classList.remove('hidden');
+          clearProgressError();
+      }
+
+      /**
+       * Show error message
+       */
+      function showProgressError(msg) {
+          const errorEl = document.getElementById('progressError');
+          errorEl.textContent = msg;
+          errorEl.classList.remove('hidden');
+      }
+
+      /**
+       * Clear error message
+       */
+      function clearProgressError() {
+          const errorEl = document.getElementById('progressError');
+          errorEl.textContent = '';
+          errorEl.classList.add('hidden');
+      }
+
+      /**
+       * Setup progress widget based on user role
+       */
+      function setupProgressWidget(userRole) {
+          const token = localStorage.getItem('token');
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          
+          window.isTechnician = userRole === 'technician' || user.role === 'technician';
+          
+          if (window.isTechnician) {
+              document.getElementById('toggleProgressFormBtn').classList.remove('hidden');
+          } else {
+              document.getElementById('toggleProgressFormBtn').classList.add('hidden');
+          }
+      }
+
+      /**
+       * Escape HTML to prevent XSS
+       */
+      function escapeHtml(text) {
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+      }
+  </script>
 </head>
 
 <body>
@@ -160,6 +372,39 @@
             
             <!-- SLA WIDGET -->
             <div id="sla-widget" class="mb-8" style="display: none;"></div>
+            
+            <!-- PROGRESS UPDATES WIDGET -->
+            <div id="progressWidget" class="border-t-2 border-gray-200 pt-6 mb-8" style="display: none;">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">📊 Work Progress</h3>
+
+                <!-- Add Progress Update Form (Technician Only) -->
+                <div id="progressForm" class="hidden mb-6 bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <label class="block text-gray-700 font-semibold mb-2">Add Progress Update</label>
+                    <textarea id="progressMessage" 
+                        placeholder="Update the employee on your progress..." 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                        rows="3"></textarea>
+                    <div class="flex gap-2 mt-3">
+                        <button onclick="submitProgressUpdate()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium">
+                            Post Update
+                        </button>
+                        <button onclick="cancelProgressUpdate()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 font-medium">
+                            Cancel
+                        </button>
+                    </div>
+                    <p id="progressError" class="text-sm text-red-600 mt-2 hidden"></p>
+                </div>
+
+                <!-- Show/Hide Form Button (Technician Only) -->
+                <button id="toggleProgressFormBtn" onclick="toggleProgressForm()" class="hidden px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-medium mb-4">
+                    ➕ Add Progress Update
+                </button>
+
+                <!-- Progress Updates List -->
+                <div id="progressUpdatesList" class="space-y-4">
+                    <p class="text-gray-500 text-center py-4">Loading progress updates...</p>
+                </div>
+            </div>
             
             <!-- Reporter Details Section -->
             <div class="border-t-2 border-gray-200 pt-6 mb-8">

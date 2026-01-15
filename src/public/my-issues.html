@@ -27,11 +27,28 @@
   <link rel="stylesheet" href="/sla-widget.css">
   <script defer src="/sla-widget.js"></script>
 
+  <style>
+    .star-rating {
+      display: flex;
+      gap: 8px;
+      font-size: 2rem;
+    }
+    .star-rating span {
+      cursor: pointer;
+      color: #ccc;
+      transition: color 0.2s;
+    }
+    .star-rating span:hover,
+    .star-rating span.active {
+      color: #ffc107;
+    }
+  </style>
+
 </head>
 
-<body class="relative overflow-hidden bg-gradient-to-br from-slate-100 via-teal-50 to-white min-h-screen">
+<body class="relative overflow-y-auto bg-gradient-to-br from-slate-100 via-teal-50 to-white min-h-screen">
 
-  <!-- 🌊 BACKGROUND SVG (same theme, subtle) -->
+  <!-- 🌊 BACKGROUND SVG -->
   <svg class="absolute -top-32 -right-32 w-[500px] opacity-20" viewBox="0 0 600 600">
     <path fill="#00b7a8"
       d="M300,520Q180,520 120,420Q60,320 120,220Q180,120 300,100Q420,80 500,200Q580,320 480,420Q380,520 300,520Z"/>
@@ -62,141 +79,458 @@
       </span>
     </div>
 
-    <!-- 📊 SUMMARY BADGES (HTML ONLY) -->
+    <!-- 📊 SUMMARY BADGES -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
       <div class="bg-white/80 backdrop-blur rounded-2xl p-4 text-center shadow">
         <p class="text-sm text-gray-500">Total</p>
         <p id="totalCount" class="text-2xl font-bold text-primary">0</p>
-
       </div>
 
       <div class="bg-yellow-50 rounded-2xl p-4 text-center shadow">
         <p class="text-sm text-gray-500">Pending</p>
         <p id="pendingCount" class="text-2xl font-bold text-yellow-600">0</p>
-
       </div>
 
       <div class="bg-green-50 rounded-2xl p-4 text-center shadow">
         <p class="text-sm text-gray-500">Resolved</p>
         <p id="resolvedCount" class="text-2xl font-bold text-green-600">0</p>
-
       </div>
 
       <div class="bg-red-50 rounded-2xl p-4 text-center shadow">
         <p class="text-sm text-gray-500">Urgent</p>
         <p id="urgentCount" class="text-2xl font-bold text-red-600">0</p>
-
       </div>
     </div>
 
-    <!-- 🔍 FILTER CHIPS (UI ONLY) -->
-    <div class="flex flex-wrap gap-3 mb-6">
-      <button class="px-4 py-1 rounded-full text-sm font-medium
-                     bg-teal-600 text-white shadow">
-        All
-      </button>
-
-      <button class="px-4 py-1 rounded-full text-sm font-medium
-                     bg-red-100 text-red-700 hover:bg-red-200 transition">
-        Urgent
-      </button>
-
-      <button class="px-4 py-1 rounded-full text-sm font-medium
-                     bg-yellow-100 text-yellow-700 hover:bg-yellow-200 transition">
-        Pending
-      </button>
-
-      <button class="px-4 py-1 rounded-full text-sm font-medium
-                     bg-green-100 text-green-700 hover:bg-green-200 transition">
-        Resolved
-      </button>
-    </div>
-
-    <!-- TABLE CARD -->
-    <section class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl overflow-hidden">
-
-      <table class="w-full text-left">
-        <thead class="bg-teal-100 text-teal-800 text-sm uppercase tracking-wide">
-          <tr>
-            <th class="p-4">Title</th>
-            <th class="p-4">Category</th>
-            <th class="p-4">Priority</th>
-            <th class="p-4">Status</th>
-            <th class="p-4">Last Updated</th>
-          </tr>
-        </thead>
-
-        <!-- 👁️ ROW CLICK READY (JS baad me) -->
-        <tbody id="myIssuesTable"
-               class="divide-y text-sm cursor-pointer
-                      [&>tr:hover]:bg-teal-50 transition">
-          <!-- JS inject karega -->
-        </tbody>
-      </table>
-
-      <!-- EMPTY STATE -->
-      <div id="emptyState"
-        class="hidden flex flex-col items-center justify-center
-               py-20 text-center text-gray-500">
-
-        <div class="text-6xl mb-4">📭</div>
-        <p class="text-lg font-semibold text-gray-700">
-          No issues reported yet
-        </p>
-        <p class="text-sm mt-2 max-w-sm">
-          Once you report an issue, it will appear here.
-        </p>
-      </div>
-    </section>
-
-    <!-- 👁️ ISSUE DETAIL MODAL (HTML ONLY) -->
-    <div class="fixed inset-0 hidden items-center justify-center
-                bg-black/40 backdrop-blur-sm z-50">
-
-      <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6">
-        <h3 class="text-xl font-bold text-primary mb-2">
-          Issue Details
-        </h3>
-
-        <p class="text-sm text-gray-600 mb-4">
-          (Row click se future me open hoga)
-        </p>
-
-        <div class="space-y-3 text-sm">
-          <p><strong>Title:</strong> AC not working</p>
-          <p><strong>Category:</strong> Electrical</p>
-          <p><strong>Priority:</strong>
-            <span class="px-2 py-1 rounded-full bg-red-100 text-red-700">
-              Urgent
-            </span>
-          </p>
-          <p><strong>Status:</strong> Pending</p>
-          <p><strong>Description:</strong> AC not cooling properly.</p>
-        </div>
-
-        <div class="mt-6 text-right">
-          <button class="px-5 py-2 rounded-xl bg-primary text-white">
-            Close
-          </button>
-        </div>
-      </div>
+    <!-- ISSUES CONTAINER -->
+    <div id="issuesContainer" class="space-y-4">
+      <p class="text-gray-500 text-center py-12">Loading your issues...</p>
     </div>
 
   </main>
 
+  <!-- ISSUE DETAIL MODAL -->
+  <div id="issueModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto">
+      <!-- Close Button -->
+      <button id="closeModalBtn" class="float-right text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+      
+      <!-- Issue Title -->
+      <h2 id="modalTitle" class="text-3xl font-bold text-gray-900 mb-4 pr-8">Issue Title</h2>
+      
+      <!-- Status Badge -->
+      <div class="mb-6">
+        <span id="modalStatus" class="px-4 py-2 rounded-full font-bold text-sm">Status</span>
+      </div>
+      
+      <!-- Issue Details -->
+      <div class="grid grid-cols-2 gap-6 mb-8">
+        <div>
+          <p class="text-gray-600 text-sm font-semibold mb-1">Category</p>
+          <p id="modalCategory" class="text-lg text-gray-900 font-bold">-</p>
+        </div>
+        <div>
+          <p class="text-gray-600 text-sm font-semibold mb-1">Priority</p>
+          <p id="modalPriority" class="text-lg text-gray-900 font-bold">-</p>
+        </div>
+        <div>
+          <p class="text-gray-600 text-sm font-semibold mb-1">Location</p>
+          <p id="modalLocation" class="text-lg text-gray-900 font-bold">-</p>
+        </div>
+        <div>
+          <p class="text-gray-600 text-sm font-semibold mb-1">Created</p>
+          <p id="modalCreated" class="text-lg text-gray-900 font-bold">-</p>
+        </div>
+      </div>
+      
+      <!-- Description -->
+      <div class="mb-8">
+        <p class="text-gray-600 text-sm font-semibold mb-2">Description</p>
+        <p id="modalDescription" class="text-gray-700 leading-relaxed">-</p>
+      </div>
+      
+      <!-- SLA WIDGET -->
+      <div id="sla-widget" class="mb-8" style="display: none;"></div>
+      
+      <!-- TECHNICIAN RATING SECTION (For Resolved Issues) -->
+      <div id="ratingSection" class="border-t-2 border-gray-200 pt-6 mb-8" style="display: none;">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">⭐ Rate Technician</h3>
+        <div class="bg-amber-50 p-6 rounded-2xl border-2 border-amber-200">
+          <p class="text-gray-600 mb-4">How was the service quality?</p>
+          
+          <!-- Star Rating -->
+          <div class="star-rating mb-4" id="starRating">
+            <span class="star" data-value="1">★</span>
+            <span class="star" data-value="2">★</span>
+            <span class="star" data-value="3">★</span>
+            <span class="star" data-value="4">★</span>
+            <span class="star" data-value="5">★</span>
+          </div>
+          
+          <p id="ratingFeedback" class="text-sm text-gray-600 mb-4">Select a rating</p>
+          
+          <!-- Review Text -->
+          <label class="block text-gray-700 font-semibold mb-2">Review (Optional)</label>
+          <textarea id="reviewText" 
+            placeholder="Share your feedback about the technician's work..." 
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
+            rows="3" maxlength="500"></textarea>
+          <p class="text-xs text-gray-500 mt-1"><span id="reviewCharCount">0</span>/500 characters</p>
+          
+          <!-- Submit Rating -->
+          <button onclick="submitRating()" id="submitRatingBtn" class="mt-4 w-full px-6 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 font-bold transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            Submit Rating
+          </button>
+          
+          <p id="ratingMessage" class="text-sm text-center mt-2"></p>
+        </div>
+        
+        <!-- Show Current Rating (if already rated) -->
+        <div id="currentRatingDisplay" style="display: none;" class="mt-4 bg-green-50 p-4 rounded-lg border border-green-200">
+          <p class="text-sm text-green-700">✅ You have already rated this issue</p>
+          <div class="flex items-center gap-2 mt-2">
+            <span id="currentStars" class="text-lg">★★★★★</span>
+            <span id="currentRating" class="font-bold text-green-700"></span>
+          </div>
+          <p id="currentReview" class="text-sm text-gray-600 mt-2 italic"></p>
+        </div>
+      </div>
+      
+      <!-- Assigned Technician -->
+      <div class="border-t-2 border-gray-200 pt-6 mb-8">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">👨‍🔧 Assigned Technician</h3>
+        <div id="technicianSection" class="bg-gradient-to-r from-blue/10 to-cyan/10 p-6 rounded-2xl border-2 border-blue/20">
+          <p class="text-center text-gray-600 py-4">Loading technician info...</p>
+        </div>
+      </div>
+      
+      <!-- Progress Updates -->
+      <div class="border-t-2 border-gray-200 pt-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">📊 Work Progress</h3>
+        <div id="progressUpdatesList" class="space-y-4">
+          <p class="text-gray-500 text-center py-4">No progress updates yet</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Back to Dashboard functionality
-    document.getElementById("backBtn").addEventListener("click", () => {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      if (user.role === "technician") {
-        window.location.href = "Technician.html";
+    const API_BASE = "http://localhost:5000/api";
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    let allIssues = [];
+    let currentIssueId = null;
+    let selectedRating = 0;
+
+    if (!token || !user.id) {
+      alert("Please login first");
+      window.location.href = "login.html";
+    }
+
+    // Load employee's issues
+    async function loadMyIssues() {
+      try {
+        const response = await fetch(`${API_BASE}/employee/issues`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+          console.error("Failed to load issues");
+          return;
+        }
+
+        const data = await response.json();
+        allIssues = data.issues || [];
+        displayIssues();
+        updateSummary();
+
+      } catch (error) {
+        console.error("Error loading issues:", error);
+      }
+    }
+
+    function displayIssues() {
+      const container = document.getElementById("issuesContainer");
+      
+      if (allIssues.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-12">No issues reported yet</p>';
+        return;
+      }
+
+      container.innerHTML = allIssues.map(issue => {
+        const statusColors = {
+          'open': 'bg-yellow-100 text-yellow-800',
+          'assigned': 'bg-blue-100 text-blue-800',
+          'in-progress': 'bg-purple-100 text-purple-800',
+          'resolved': 'bg-green-100 text-green-800',
+          'closed': 'bg-gray-100 text-gray-800'
+        };
+
+        return `
+          <div class="bg-white/80 backdrop-blur rounded-xl p-6 shadow hover:shadow-lg transition cursor-pointer" onclick="viewIssueDetails('${issue._id}')">
+            <div class="flex justify-between items-start mb-4">
+              <h3 class="text-lg font-bold text-gray-900">${issue.title}</h3>
+              <span class="px-3 py-1 rounded-full text-xs font-bold capitalize ${statusColors[issue.status] || 'bg-gray-100'}">
+                ${issue.status}
+              </span>
+            </div>
+            <p class="text-sm text-gray-600 mb-3">${issue.description.substring(0, 100)}...</p>
+            <div class="flex gap-4 text-sm">
+              <span class="text-gray-500">📍 ${issue.location}</span>
+              <span class="text-gray-500">🏷️ ${issue.category}</span>
+              <span class="font-semibold" style="color: ${getPriorityColor(issue.priority)}">
+                ${issue.priority}
+              </span>
+            </div>
+            ${issue.technicianRating?.rating ? `<div class="mt-2 text-sm">⭐ Rated: ${issue.technicianRating.rating}/5</div>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getPriorityColor(priority) {
+      const colors = {
+        'Routine': '#10b981',
+        'Risky': '#f59e0b',
+        'Urgent': '#ef4444',
+        'Critical': '#dc2626'
+      };
+      return colors[priority] || '#6b7280';
+    }
+
+    function updateSummary() {
+      document.getElementById('totalCount').textContent = allIssues.length;
+      document.getElementById('pendingCount').textContent = allIssues.filter(i => 
+        i.status === 'open' || i.status === 'assigned' || i.status === 'in-progress'
+      ).length;
+      document.getElementById('resolvedCount').textContent = allIssues.filter(i => 
+        i.status === 'resolved' || i.status === 'closed'
+      ).length;
+      document.getElementById('urgentCount').textContent = allIssues.filter(i => 
+        i.priority === 'Urgent' || i.priority === 'Critical'
+      ).length;
+    }
+
+    function viewIssueDetails(issueId) {
+      const issue = allIssues.find(i => i._id === issueId);
+      if (!issue) return;
+
+      currentIssueId = issueId;
+      const modal = document.getElementById('issueModal');
+
+      // Fill details
+      document.getElementById('modalTitle').textContent = issue.title;
+      document.getElementById('modalCategory').textContent = issue.category || '-';
+      document.getElementById('modalPriority').textContent = issue.priority || '-';
+      document.getElementById('modalLocation').textContent = issue.location || '-';
+      document.getElementById('modalDescription').textContent = issue.description || '-';
+      document.getElementById('modalCreated').textContent = new Date(issue.createdAt).toLocaleDateString();
+
+      // Status badge
+      const statusColors = {
+        'open': 'bg-yellow-100 text-yellow-800',
+        'assigned': 'bg-blue-100 text-blue-800',
+        'in-progress': 'bg-purple-100 text-purple-800',
+        'resolved': 'bg-green-100 text-green-800',
+        'closed': 'bg-gray-100 text-gray-800'
+      };
+      const statusBadge = document.getElementById('modalStatus');
+      statusBadge.textContent = issue.status.toUpperCase();
+      statusBadge.className = `px-4 py-2 rounded-full font-bold text-sm capitalize ${statusColors[issue.status] || 'bg-gray-100'}`;
+
+      // Technician info
+      const technicianSection = document.getElementById('technicianSection');
+      if (issue.assignedTechnician) {
+        const tech = issue.assignedTechnician;
+        technicianSection.innerHTML = `
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 flex items-center justify-center text-white text-2xl font-bold">
+              ${tech.name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Assigned Technician</p>
+              <p class="text-xl font-bold text-gray-900">${tech.name}</p>
+              <p class="text-sm text-gray-600 mt-1">📧 ${tech.email}</p>
+            </div>
+          </div>
+        `;
+      }
+
+      // Progress updates
+      displayProgressUpdates(issue.progressUpdates || []);
+
+      // Rating section
+      showRatingSection(issue);
+
+      // SLA Widget
+      if (typeof slaWidget !== 'undefined') {
+        slaWidget.displaySLAWidget(issueId);
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function displayProgressUpdates(updates) {
+      const container = document.getElementById('progressUpdatesList');
+      
+      if (!updates || updates.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-4">No progress updates yet</p>';
+        return;
+      }
+
+      container.innerHTML = updates.map((update, idx) => {
+        const isLast = idx === updates.length - 1;
+        return `
+          <div class="flex gap-4 pb-4 ${!isLast ? 'border-b border-gray-200' : ''}">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold flex-shrink-0">
+              ${update.technician?.name?.charAt(0).toUpperCase() || 'T'}
+            </div>
+            <div class="flex-1">
+              <div class="flex justify-between items-start mb-1">
+                <p class="font-bold text-gray-900">${update.technician?.name || 'Technician'}</p>
+                <span class="text-xs text-gray-500">${new Date(update.timestamp).toLocaleString()}</span>
+              </div>
+              <p class="text-gray-700">${escapeHtml(update.message)}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showRatingSection(issue) {
+      const ratingSection = document.getElementById('ratingSection');
+      const currentRatingDisplay = document.getElementById('currentRatingDisplay');
+      
+      // Show rating section only for resolved issues
+      if (issue.status === 'resolved' || issue.status === 'closed') {
+        ratingSection.style.display = 'block';
+        
+        if (issue.technicianRating?.rating) {
+          // Already rated
+          currentRatingDisplay.style.display = 'block';
+          document.getElementById('currentStars').textContent = '★'.repeat(issue.technicianRating.rating) + '☆'.repeat(5 - issue.technicianRating.rating);
+          document.getElementById('currentRating').textContent = `${issue.technicianRating.rating}/5`;
+          document.getElementById('currentReview').textContent = issue.technicianRating.review || '(No review)';
+          document.getElementById('submitRatingBtn').disabled = true;
+        } else {
+          // Not yet rated
+          currentRatingDisplay.style.display = 'none';
+          document.getElementById('submitRatingBtn').disabled = false;
+          selectedRating = 0;
+          document.getElementById('reviewText').value = '';
+          updateStarDisplay();
+        }
       } else {
-        window.location.href = "Employee.html";
+        ratingSection.style.display = 'none';
+      }
+    }
+
+    // Star Rating Interaction
+    document.addEventListener('DOMContentLoaded', () => {
+      const stars = document.querySelectorAll('.star-rating .star');
+      stars.forEach(star => {
+        star.addEventListener('click', () => {
+          selectedRating = parseInt(star.dataset.value);
+          updateStarDisplay();
+          updateRatingFeedback();
+        });
+        star.addEventListener('mouseenter', () => {
+          const hoverValue = parseInt(star.dataset.value);
+          stars.forEach((s, idx) => {
+            if (idx < hoverValue) s.style.color = '#ffc107';
+            else s.style.color = '#ccc';
+          });
+        });
+      });
+
+      document.getElementById('starRating').addEventListener('mouseleave', updateStarDisplay);
+
+      // Character counter for review
+      document.getElementById('reviewText').addEventListener('input', () => {
+        document.getElementById('reviewCharCount').textContent = document.getElementById('reviewText').value.length;
+      });
+    });
+
+    function updateStarDisplay() {
+      const stars = document.querySelectorAll('.star-rating .star');
+      stars.forEach((star, idx) => {
+        if (idx < selectedRating) {
+          star.style.color = '#ffc107';
+          star.classList.add('active');
+        } else {
+          star.style.color = '#ccc';
+          star.classList.remove('active');
+        }
+      });
+    }
+
+    function updateRatingFeedback() {
+      const feedbacks = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+      document.getElementById('ratingFeedback').textContent = feedbacks[selectedRating] || 'Select a rating';
+    }
+
+    async function submitRating() {
+      if (selectedRating === 0) {
+        alert('Please select a rating');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/completion/rate-technician/${currentIssueId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            rating: selectedRating,
+            review: document.getElementById('reviewText').value.trim()
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          alert(error.message || 'Failed to submit rating');
+          return;
+        }
+
+        alert('✅ Thank you for rating the technician!');
+        loadMyIssues();
+        viewIssueDetails(currentIssueId);
+
+      } catch (error) {
+        console.error('Error submitting rating:', error);
+        alert('Error submitting rating. Please try again.');
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Close modal
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+      document.getElementById('issueModal').classList.add('hidden');
+    });
+
+    document.getElementById('issueModal').addEventListener('click', (e) => {
+      if (e.target.id === 'issueModal') {
+        document.getElementById('issueModal').classList.add('hidden');
       }
     });
+
+    // Back button
+    document.getElementById('backBtn').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    // Load issues on page load
+    loadMyIssues();
+    setInterval(loadMyIssues, 5000);
   </script>
 
-  <!-- JS (UNCHANGED) -->
-  <script src="empv1.js"></script>
 </body>
 </html>
